@@ -1,0 +1,110 @@
+/*
+ * DESIGN TOKENS — owin-landing.
+ *
+ * Bảng màu sáng lấy đúng theo công cụ quản trị (`tokens.css` của
+ * owin-quote-tool) để hai nơi là một hệ. Bảng màu TỐI là mới: công cụ quản trị
+ * chưa có bộ token tối nào ngoài màn đăng nhập, nên trang công khai tự định
+ * nghĩa lấy.
+ *
+ * Cơ chế chuyển sáng/tối dùng lại quy ước cũ: thuộc tính `data-appearance` trên
+ * <html>. Thiếu thuộc tính đó thì theo hệ điều hành.
+ */
+:root {
+  color-scheme: light dark;
+
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --surface-muted: #f7f7fa;
+  --border: rgba(60, 60, 67, 0.24);
+  --text: #1c1c1e;
+  --text-muted: #55555e;
+  --text-faint: #6e6e73;
+  --accent: #006edc;
+  --accent-contrast: #ffffff;
+  --success: #248a3d;
+  --warning: #c93400;
+  --danger: #d70015;
+
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-display: clamp(2rem, 1.4rem + 3vw, 3.5rem);
+
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --font-sans: 'Roboto', 'Noto Sans', 'Segoe UI', system-ui, 'Liberation Sans', Arial, sans-serif;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * Nền tối KHÔNG dùng đen tuyệt đối: mặt phẳng phải tách được khỏi nền thì thẻ
+ * mới nổi lên, và đen tuyệt đối trên màn OLED làm chữ trắng bị nhoè viền.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-appearance='light']) {
+    --bg: #14141a;
+    --surface: #1e1e25;
+    --surface-muted: #262630;
+    --border: rgba(235, 235, 245, 0.18);
+    --text: #f5f5f7;
+    --text-muted: #b6b6c0;
+    --text-faint: #8e8e99;
+    --accent: #7cbcff;
+    --accent-contrast: #0a2540;
+    --success: #4cd071;
+    --warning: #ffa04d;
+    --danger: #ff6b6b;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-appearance='dark'] {
+  --bg: #14141a;
+  --surface: #1e1e25;
+  --surface-muted: #262630;
+  --border: rgba(235, 235, 245, 0.18);
+  --text: #f5f5f7;
+  --text-muted: #b6b6c0;
+  --text-faint: #8e8e99;
+  --accent: #7cbcff;
+  --accent-contrast: #0a2540;
+  --success: #4cd071;
+  --warning: #ffa04d;
+  --danger: #ff6b6b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

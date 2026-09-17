@@ -1,0 +1,114 @@
+.shell {
+  max-width: 720px;
+  /* Lề 16px hai bên ở khổ hẹp: 375px không được tràn ngang. */
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-8);
+}
+
+.shell-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.shell-head > strong {
+  font-size: var(--fs-xl);
+  letter-spacing: -0.02em;
+}
+
+.theme-switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+}
+
+.theme-switch button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.theme-switch button.is-active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 500;
+}
+
+.card {
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.card h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.muted { color: var(--text-muted); }
+.small { font-size: var(--fs-sm); }
+
+.proof {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-muted);
+}
+
+.proof-label {
+  margin-bottom: var(--space-2);
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.proof code {
+  display: block;
+  margin-bottom: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  /* Chuỗi dài không được đẩy rộng trang ở khổ điện thoại. */
+  overflow-wrap: anywhere;
+}
+
+.proof-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+
+.proof-row > strong {
+  font-size: var(--fs-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.proof > .muted.small {
+  margin: var(--space-3) 0 0;
+}
+
+.proof > .muted.small code {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+}
