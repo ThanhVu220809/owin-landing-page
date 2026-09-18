@@ -20,6 +20,69 @@ export interface ProductPage {
   total: number;
 }
 
+/** Đủ để hiện trong bộ chọn, không đủ để tính tiền. */
+export interface ProductOption {
+  id: string;
+  name: string;
+  category: string;
+  /** Kích thước mẫu, dạng thô như admin nhập ("2.80 x 2.80"). */
+  rawSizeText: string | null;
+  unitPriceVnd: number | null;
+}
+
+/**
+ * Danh sách cho bộ chọn sản phẩm.
+ *
+ * Chỉ lấy các cột phẳng — cả 333 sản phẩm kèm cột `data` là 613 KB, còn danh
+ * sách tên thì vài chục KB. Khi khách chọn một sản phẩm mới tải `data` của
+ * đúng sản phẩm đó để tính tiền.
+ *
+ * Lấy kèm kích thước và đơn giá vì RẤT NHIỀU sản phẩm trùng tên nhau — riêng
+ * "Cửa Đi Mở Quay Nhôm OWIN Hệ Khuôn Phào" có hàng chục bản, chỉ khác kích
+ * thước và giá. Chỉ hiện tên thì khách nhìn vào một danh sách các dòng giống
+ * hệt nhau, không biết chọn cái nào.
+ */
+export async function fetchProductOptions(): Promise<ProductOption[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('id,name,category,raw_size_text,unit_price_vnd')
+    .eq('store_id', STORE_ID)
+    .order('sort_order', { ascending: true, nullsFirst: false })
+    .order('code', { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((row) => {
+    const r = row as {
+      id: string;
+      name: string | null;
+      category: string | null;
+      raw_size_text: string | null;
+      unit_price_vnd: number | null;
+    };
+    return {
+      id: r.id,
+      name: r.name ?? '',
+      category: r.category ?? '',
+      rawSizeText: r.raw_size_text,
+      unitPriceVnd: r.unit_price_vnd,
+    };
+  });
+}
+
+/** Tài liệu đầy đủ của một sản phẩm — cần cột `data` mới tính được tiền. */
+export async function fetchProductById(id: string): Promise<ProductRecord | null> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('data')
+    .eq('store_id', STORE_ID)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return data ? (data as { data: ProductRecord }).data : null;
+}
+
 export async function fetchPublicProducts(offset = 0, limit = PAGE_SIZE): Promise<ProductPage> {
   const { data, error, count } = await supabase
     .from('products')

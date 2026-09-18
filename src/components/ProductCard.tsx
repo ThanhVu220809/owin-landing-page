@@ -25,7 +25,13 @@ function priceLabel(product: ProductRecord): string {
  * có nhãn, không dùng ảnh thay thế; không có thông số thì bỏ hàng thông số.
  * Không bịa mô tả, không bịa lời quảng cáo.
  */
-export function ProductCard({ product }: { product: ProductRecord }) {
+export function ProductCard({
+  product,
+  onCalculate,
+}: {
+  product: ProductRecord;
+  onCalculate: (id: string) => void;
+}) {
   const image = listImageUrl(product.coverImagePath);
   const price = priceFor(product);
   const specs = (product.specs ?? []).slice(0, MAX_SPECS);
@@ -64,6 +70,14 @@ export function ProductCard({ product }: { product: ProductRecord }) {
           <div className="product-card-price-label">{priceLabel(product)}</div>
           <strong>{formatVnd(price.displayVnd)}</strong>
         </div>
+
+        <button
+          type="button"
+          className="btn product-card-cta"
+          onClick={() => onCalculate(product.id)}
+        >
+          Tính giá theo kích thước của bạn
+        </button>
       </div>
     </article>
   );

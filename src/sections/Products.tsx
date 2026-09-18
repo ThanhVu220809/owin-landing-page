@@ -10,7 +10,7 @@ import { ProductCard } from '@/components/ProductCard';
  * trang công khai mà nói với khách rằng cửa hàng không có gì để bán thì thà
  * đừng nói gì. Lỗi tải thì nói thật là đang lỗi, đừng giả vờ là rỗng.
  */
-export function Products() {
+export function Products({ onCalculate }: { onCalculate: (id: string) => void }) {
   const [products, setProducts] = useState<ProductRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -77,7 +77,7 @@ export function Products() {
 
       <div className="product-grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} onCalculate={onCalculate} />
         ))}
       </div>
 

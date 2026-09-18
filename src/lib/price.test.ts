@@ -56,6 +56,75 @@ describe('priceFor — nhánh Báo giá cho cả thẻ sản phẩm lẫn bộ t
     expect(withSize.totalVnd).toBe(16_000_000);
   });
 
+  it('tiền phụ kiện vào đúng tổng và nhân theo số lượng', () => {
+    const product = sampleProduct({
+      rawSizeText: '2 x 3',
+      unitPriceVnd: 1_000_000,
+      fixedAccessoryPackage: JSON.stringify({
+        name: 'Bộ phụ kiện đi kèm',
+        unitPrice: 8_000_000,
+        packageQuantity: 1,
+      }),
+    } as Partial<ProductRecord>);
+
+    const one = priceFor(product, { widthM: 2, heightM: 3, quantity: 1 });
+    expect(one.productVnd).toBe(6_000_000);
+    expect(one.accessoryVnd).toBe(8_000_000);
+    expect(one.totalVnd).toBe(14_000_000);
+
+    // SL bộ phụ kiện = SL gốc trên sản phẩm × tổng SL hạng mục, nên phụ kiện
+    // nhân lên theo — không phải cộng một lần rồi thôi.
+    const three = priceFor(product, { widthM: 2, heightM: 3, quantity: 3 });
+    expect(three.productVnd).toBe(18_000_000);
+    expect(three.accessoryVnd).toBe(24_000_000);
+    expect(three.totalVnd).toBe(42_000_000);
+  });
+
+  /**
+   * GHI LẠI MỘT HÀNH VI DỄ GÂY HIỂU NHẦM.
+   *
+   * Sản phẩm có thể mang hai loại phụ kiện, và chúng cư xử KHÁC nhau khi đổi
+   * số lượng:
+   *   - bộ phụ kiện cố định  → nhân theo số lượng (SL bộ = SL gốc × tổng SL);
+   *   - phụ kiện lẻ          → GIỮ NGUYÊN, không nhân.
+   *
+   * Đây là hành vi của engine, tức là tab Báo giá cũng ra đúng như vậy — nên
+   * trang công khai làm theo là ĐÚNG YÊU CẦU (hai nơi phải trùng số). Nhưng nó
+   * dễ khiến người xem tưởng tính sai, nên khoá lại bằng test để nó là một
+   * lựa chọn có chủ đích chứ không phải tai nạn.
+   */
+  it('bộ phụ kiện cố định nhân theo số lượng, phụ kiện lẻ thì không', () => {
+    const product = sampleProduct({
+      rawSizeText: '2 x 3',
+      unitPriceVnd: 1_000_000,
+      fixedAccessoryPackage: JSON.stringify({
+        name: 'Bộ phụ kiện', unitPrice: 8_000_000, packageQuantity: 1,
+      }),
+      extraAccessories: JSON.stringify([
+        { id: 'e1', name: 'Phào', unit: 'BO', quantity: 1, unitPrice: 2_000_000 },
+      ]),
+    } as Partial<ProductRecord>);
+
+    const one = priceFor(product, { widthM: 2, heightM: 3, quantity: 1 });
+    expect(one.accessoryVnd).toBe(10_000_000); // 8tr bộ + 2tr lẻ
+
+    const three = priceFor(product, { widthM: 2, heightM: 3, quantity: 3 });
+    expect(three.productVnd).toBe(18_000_000); // tiền sản phẩm nhân đủ 3
+    expect(three.accessoryVnd).toBe(26_000_000); // 24tr bộ + 2tr lẻ GIỮ NGUYÊN
+  });
+
+  it('biên làm tròn: khối lượng chốt ở 3 số lẻ TRƯỚC khi nhân', () => {
+    // 1.0005 × 1 × 1 = 1.0005 — đúng ngay ranh giới số lẻ thứ ba.
+    //   làm tròn trước  → 1,001 × 1.000.000 = 1.001.000
+    //   không làm tròn  → 1,0005 × 1.000.000 = 1.000.500  ← sai
+    // Chỉ thử vài sản phẩm "tròn trịa" thì không bao giờ bắt được chỗ này.
+    const product = sampleProduct({ unitPriceVnd: 1_000_000 } as Partial<ProductRecord>);
+    const price = priceFor(product, { widthM: 1.0005, heightM: 1, quantity: 1 });
+    expect(price.totalVnd).toBe(1_001_000);
+    // Rồi tổng mới bị làm tròn xuống bội số 100.000.
+    expect(price.displayVnd).toBe(1_000_000);
+  });
+
   it('giá trọn gói được chia ngược về đơn giá trước khi tính', () => {
     // Không có dấu hiệu đơn giá trong rawPriceText → 6.000.000 là giá TRỌN GÓI
     // cho đúng kích thước mẫu, không phải đơn giá mỗi m².
