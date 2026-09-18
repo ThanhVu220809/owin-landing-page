@@ -70,6 +70,31 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
   });
 }
 
+/**
+ * Sản phẩm chủ cửa hàng chọn làm nổi bật.
+ *
+ * Lọc theo `data->>isFeatured` chứ không theo cột quan hệ, vì cờ này CỐ Ý chỉ
+ * sống trong `data`: khác `is_public`, RLS không cần nó, nên giữ ở một nơi duy
+ * nhất thì không bao giờ có chuyện hai nơi lệch nhau. Với vài trăm dòng thì
+ * quét tuần tự không đáng kể.
+ *
+ * Không ai được chọn thì trả mảng rỗng và trang ẩn hẳn phần đó — chứ không tự
+ * lấy bừa mấy sản phẩm đầu danh sách rồi gọi chúng là "nổi bật".
+ */
+export async function fetchFeaturedProducts(limit = 8): Promise<ProductRecord[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('id,data')
+    .eq('store_id', STORE_ID)
+    .eq('data->>isFeatured', 'true')
+    .order('sort_order', { ascending: true, nullsFirst: false })
+    .order('code', { ascending: true })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row) => (row as { data: ProductRecord }).data);
+}
+
 /** Tài liệu đầy đủ của một sản phẩm — cần cột `data` mới tính được tiền. */
 export async function fetchProductById(id: string): Promise<ProductRecord | null> {
   const { data, error } = await supabase

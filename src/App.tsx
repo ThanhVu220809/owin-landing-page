@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSiteContent } from '@/SiteContentContext'
 import { Hero } from '@/sections/Hero'
 import { Calculator } from '@/sections/Calculator'
+import { Featured } from '@/sections/Featured'
 import { Products } from '@/sections/Products'
 import { Reasons } from '@/sections/Reasons'
 import { Contact } from '@/sections/Contact'
@@ -79,6 +80,7 @@ function App() {
 
       <main id="noi-dung">
         <Hero />
+        <Featured onCalculate={calculateProduct} />
         <Calculator selectedId={selectedProductId} onSelect={setSelectedProductId} />
         <Products onCalculate={calculateProduct} />
         <Reasons />
