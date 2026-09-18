@@ -1,4 +1,4 @@
-import { content } from '@/content';
+import { useSiteContent } from '@/SiteContentContext';
 
 /**
  * Phần mở đầu của trang.
@@ -8,7 +8,7 @@ import { content } from '@/content';
  * chú đầu `content.ts`.
  */
 export function Hero() {
-  const { hero, contact } = content;
+  const { hero, contact } = useSiteContent();
 
   const scrollToProducts = () => {
     document.getElementById('san-pham')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

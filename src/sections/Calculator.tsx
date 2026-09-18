@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ProductRecord } from '@owin/quote-engine';
-import { content } from '@/content';
+import { useSiteContent } from '@/SiteContentContext';
 import { formatVnd, unitLabel } from '@/lib/format';
 import { priceFor } from '@/lib/price';
 import { fetchProductById, fetchProductOptions, type ProductOption } from '@/lib/products';
@@ -39,6 +39,7 @@ export function Calculator({
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
+  const { contact } = useSiteContent();
   const [options, setOptions] = useState<ProductOption[]>([]);
   const [product, setProduct] = useState<ProductRecord | null>(null);
   const [width, setWidth] = useState('');
@@ -196,9 +197,9 @@ export function Calculator({
               </p>
 
               <div className="calculator-actions">
-                <a className="btn btn-primary" href={`tel:${content.contact.phone}`}>Gọi</a>
-                <a className="btn" href={content.contact.zaloUrl} target="_blank" rel="noopener noreferrer">Zalo</a>
-                <a className="btn" href={content.contact.messengerUrl} target="_blank" rel="noopener noreferrer">Messenger</a>
+                <a className="btn btn-primary" href={`tel:${contact.phone}`}>Gọi</a>
+                <a className="btn" href={contact.zaloUrl} target="_blank" rel="noopener noreferrer">Zalo</a>
+                <a className="btn" href={contact.messengerUrl} target="_blank" rel="noopener noreferrer">Messenger</a>
               </div>
             </>
           )}

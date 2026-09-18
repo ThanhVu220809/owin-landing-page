@@ -1,4 +1,4 @@
-import { content } from '@/content';
+import { useSiteContent } from '@/SiteContentContext';
 
 /**
  * Phần lý do.
@@ -7,6 +7,7 @@ import { content } from '@/content';
  * `content.ts`. Mảng rỗng thì ẩn cả phần, không hiện khung trống.
  */
 export function Reasons() {
+  const content = useSiteContent();
   if (content.reasons.length === 0) return null;
 
   return (

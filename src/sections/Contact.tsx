@@ -1,4 +1,4 @@
-import { content } from '@/content';
+import { useSiteContent } from '@/SiteContentContext';
 
 /**
  * Liên hệ.
@@ -8,7 +8,7 @@ import { content } from '@/content';
  * trang chỉ-đọc này cố tình không đụng tới.
  */
 export function Contact() {
-  const { contact } = content;
+  const { contact } = useSiteContent();
 
   return (
     <section className="section" id="lien-he" aria-labelledby="lien-he-title">

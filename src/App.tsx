@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { content } from '@/content'
+import { useSiteContent } from '@/SiteContentContext'
 import { Hero } from '@/sections/Hero'
 import { Calculator } from '@/sections/Calculator'
 import { Products } from '@/sections/Products'
@@ -19,10 +19,12 @@ const NAV = [
 /**
  * Trang công khai.
  *
- * Chữ trong Hero và phần lý do là nội dung TẠM, chờ chủ cửa hàng thay — tất cả
- * nằm trong `content.ts`.
+ * Chữ trên trang đến từ hai nơi: `content.ts` là nội dung mặc định, còn chủ cửa
+ * hàng sửa đè lên nó trong công cụ quản trị (mục "Nội dung trang web"). Ô nào
+ * họ để trống thì mặc định được dùng.
  */
 function App() {
+  const content = useSiteContent()
   const [appearance, setAppearance] = useState<Appearance>('system')
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
