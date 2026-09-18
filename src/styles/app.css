@@ -1,5 +1,5 @@
 .shell {
-  max-width: 720px;
+  max-width: 1120px;
   /* Lề 16px hai bên ở khổ hẹp: 375px không được tràn ngang. */
   margin: 0 auto;
   padding: var(--space-6) var(--space-4) var(--space-8);
@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
 .shell-head > strong {
@@ -45,70 +45,181 @@
   font-weight: 500;
 }
 
-.card {
-  padding: var(--space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
-}
-
-.card h1 {
-  margin: 0 0 var(--space-2);
-  font-size: var(--fs-display);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
 .muted { color: var(--text-muted); }
-.small { font-size: var(--fs-sm); }
 
-.proof {
+.section { margin-bottom: var(--space-8); }
+
+.section-head { margin-bottom: var(--space-6); }
+
+.section-head h2 {
+  margin: 0 0 var(--space-2);
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.section-head p { margin: 0; font-size: var(--fs-sm); }
+
+.section-more {
+  display: flex;
+  justify-content: center;
   margin-top: var(--space-6);
+}
+
+.btn {
+  min-height: 44px;
+  padding: 0 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) { background: var(--surface-muted); }
+.btn:disabled { opacity: 0.6; cursor: progress; }
+
+.notice {
   padding: var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* ─── Lưới sản phẩm ───
+ * auto-fill + minmax để số cột tự theo bề rộng, không phải đặt breakpoint tay.
+ * 260px là chỗ thẻ còn đọc được tên hai dòng mà ảnh chưa bị bẹp. */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 400px) {
+  /* Dưới 400px, một cột đọc thoải mái hơn là cố nhét hai. */
+  .product-grid { grid-template-columns: 1fr; }
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.product-card-skeleton {
+  min-height: 320px;
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
+/* Ảnh sản phẩm đủ mọi tỉ lệ — có tấm dọc 480×640, có tấm ngang 640×477. Hộp
+ * ảnh phải tự giữ tỉ lệ 4:3 và KHÔNG để ảnh quyết định chiều cao, nếu không mỗi
+ * thẻ một chiều cao và hàng lưới cao thấp lô nhô.
+ *
+ * Ảnh đặt absolute chính vì thế: nằm trong luồng thì nó lại kéo hộp cao theo
+ * kích thước thật của mình, `aspect-ratio` thành vô nghĩa. */
+.product-card-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
   background: var(--surface-muted);
 }
 
-.proof-label {
-  margin-bottom: var(--space-2);
-  color: var(--text-faint);
-  font-size: var(--fs-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.product-card-media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.proof code {
-  display: block;
-  margin-bottom: var(--space-3);
-  color: var(--text-muted);
+.product-card-noimage {
+  color: var(--text-faint);
   font-size: var(--fs-sm);
-  /* Chuỗi dài không được đẩy rộng trang ở khổ điện thoại. */
+}
+
+.product-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--space-4);
+}
+
+.product-card-category {
+  margin-bottom: 2px;
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+}
+
+/* Tên sản phẩm dài ngắn rất khác nhau; giới hạn 2 dòng để các thẻ cùng hàng
+ * không chênh nhau cả chục pixel chỉ vì một cái tên dài. */
+.product-card-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.product-card-specs {
+  margin: 0 0 var(--space-4);
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-sm);
+}
+
+.product-card-specs > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.product-card-specs dt { color: var(--text-faint); }
+
+.product-card-specs dd {
+  margin: 0;
+  color: var(--text-muted);
+  text-align: right;
+  /* Giá trị thông số dài không được đẩy rộng thẻ. */
   overflow-wrap: anywhere;
 }
 
-.proof-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
+.product-card-price {
+  margin-top: auto;
+  padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
 
-.proof-row > strong {
+.product-card-price-label {
+  color: var(--text-faint);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.product-card-price strong {
+  display: block;
+  margin-top: 2px;
   font-size: var(--fs-lg);
   font-variant-numeric: tabular-nums;
-}
-
-.proof > .muted.small {
-  margin: var(--space-3) 0 0;
-}
-
-.proof > .muted.small code {
-  display: inline;
-  margin: 0;
-  font-size: inherit;
 }
