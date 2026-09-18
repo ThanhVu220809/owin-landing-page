@@ -26,6 +26,23 @@
 
 export interface SiteContent {
   brand: string;
+  seo: {
+    /** Thẻ <title> và tiêu đề khi chia sẻ link. Khoảng 50–60 ký tự. */
+    title: string;
+    /** Mô tả khi chia sẻ link. Khoảng 120–160 ký tự. */
+    description: string;
+    /**
+     * Địa chỉ trang khi đã lên mạng, ví dụ `https://owin.vn`. Không có dấu `/`
+     * ở cuối. Để `null` cho tới khi biết tên miền thật — đoán bừa rồi nhúng vào
+     * thẻ canonical là chỉ cho công cụ tìm kiếm một địa chỉ sai.
+     */
+    siteUrl: string | null;
+    /**
+     * Ảnh hiện ra khi chia sẻ link lên Zalo/Facebook. Phải là URL tuyệt đối.
+     * Để `null` thì link chia sẻ chỉ có chữ, không có ảnh — vẫn chạy.
+     */
+    ogImage: string | null;
+  };
   /**
    * Lý do nên chọn cửa hàng.
    *
@@ -62,6 +79,15 @@ export interface SiteContent {
 
 export const content: SiteContent = {
   brand: 'OWIN',
+
+  seo: {
+    title: 'OWIN — Cửa nhôm kính, xem giá ngay trên web',
+    description:
+      'Cửa chính, cửa sổ, cửa phòng và vách thông tầng hệ nhôm Xingfa, OWIN Lux '
+      + 'Anode. Chọn sản phẩm, nhập kích thước và xem giá tham khảo ngay.',
+    siteUrl: null,
+    ogImage: null,
+  },
 
   reasons: [
     {

@@ -1,15 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { PostgrestClient } from '@supabase/postgrest-js';
 
 /**
- * Client Supabase của trang công khai.
+ * Đường đọc dữ liệu của trang công khai.
  *
- * Dùng anon key và **không có đăng nhập**. Mọi truy vấn từ đây đi vào role
- * `anon`, và RLS quyết định đọc được gì — trang này không tự giới hạn lấy, nó
- * dựa vào hàng rào ở database.
+ * Dùng thẳng `postgrest-js` chứ KHÔNG dùng `supabase-js`. Trang này chỉ làm một
+ * việc: `select` vài bảng bằng anon key. Gói `supabase-js` đầy đủ kéo theo cả
+ * realtime (kèm phoenix), đăng nhập và storage — đo được trong bundle, và không
+ * dòng nào trong số đó được gọi ở đây. Khách vào bằng 3G không nên phải tải một
+ * client realtime để xem giá cửa.
  *
- * `persistSession: false` là cố ý: trang công khai không có phiên nào để giữ,
- * và không được vô tình nhặt phiên của công cụ quản trị nếu sau này hai bên
- * dùng chung tên miền.
+ * Không có phiên đăng nhập nào, nên mọi truy vấn đi vào role `anon` và RLS
+ * quyết định đọc được gì. Trang không tự giới hạn lấy — nó dựa vào hàng rào ở
+ * database.
  */
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -20,8 +22,11 @@ if (!url || !anonKey) {
   );
 }
 
-export const supabase = createClient(url, anonKey, {
-  auth: { persistSession: false, autoRefreshToken: false },
+export const supabase = new PostgrestClient(`${url.replace(/\/+$/, '')}/rest/v1`, {
+  headers: {
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
+  },
 });
 
 /** Cửa hàng mà bản deploy này phục vụ. */
