@@ -497,3 +497,129 @@
      không thì nó chiếm gần hết màn hình và đẩy giá xuống tận đâu. */
   .picker-list { max-height: 240px; }
 }
+
+/* ─── Điều hướng & tiếp cận ─── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* `:focus` chứ không phải `:focus-visible`. Skip link chỉ tới được bằng bàn
+ * phím nên không có nguy cơ hiện nhầm cho người dùng chuột, mà `:focus-visible`
+ * thì tuỳ trình duyệt quyết định — có lúc không khớp, và khi đó link nhận focus
+ * nhưng vẫn nằm ngoài màn hình: người dùng bàn phím mất dấu hoàn toàn. */
+.skip-link:focus {
+  left: var(--space-4);
+  top: var(--space-4);
+  z-index: 10;
+}
+
+/* Viền focus dùng chung: không có nó thì đi bằng bàn phím sẽ mất dấu hoàn toàn
+   trên các nút nền phẳng. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.shell-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.shell-nav a {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+
+.shell-nav a:hover { color: var(--text); }
+
+.shell-foot {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+}
+
+.shell-foot p { margin: 0 0 4px; }
+
+/* ─── Phần lý do ─── */
+.reason-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reason-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.reason-card h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-md);
+  font-weight: 500;
+}
+
+.reason-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+/* ─── Liên hệ ─── */
+.contact-card {
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+}
+
+.contact-card .section-head { margin-bottom: var(--space-4); }
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.contact-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.contact-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.contact-details dt {
+  margin-bottom: 2px;
+  color: var(--text-faint);
+  font-size: 0.8125rem;
+}
+
+.contact-details dd {
+  margin: 0;
+  font-size: var(--fs-sm);
+}

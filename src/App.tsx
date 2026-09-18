@@ -1,19 +1,26 @@
 import { useState } from 'react'
 import { content } from '@/content'
 import { Hero } from '@/sections/Hero'
-import { Products } from '@/sections/Products'
 import { Calculator } from '@/sections/Calculator'
+import { Products } from '@/sections/Products'
+import { Reasons } from '@/sections/Reasons'
+import { Contact } from '@/sections/Contact'
 import { PlaceholderNotice } from '@/components/PlaceholderNotice'
 import '@/styles/app.css'
 
 type Appearance = 'light' | 'dark' | 'system'
 
+const NAV = [
+  { href: '#san-pham', label: 'Sản phẩm' },
+  { href: '#tinh-gia', label: 'Tính giá' },
+  { href: '#lien-he', label: 'Liên hệ' },
+]
+
 /**
  * Trang công khai.
  *
- * Chữ trong Hero là nội dung TẠM, chờ chủ cửa hàng thay — tất cả nằm trong
- * `content.ts`. Phần "vì sao chọn OWIN" vẫn chưa làm: nó đòi những tuyên bố mà
- * chỉ chủ doanh nghiệp mới được đưa ra.
+ * Chữ trong Hero và phần lý do là nội dung TẠM, chờ chủ cửa hàng thay — tất cả
+ * nằm trong `content.ts`.
  */
 function App() {
   const [appearance, setAppearance] = useState<Appearance>('system')
@@ -39,8 +46,18 @@ function App() {
 
   return (
     <div className="shell">
+      {/* Người dùng bàn phím không phải đi qua cả menu mới tới nội dung. */}
+      <a className="skip-link" href="#noi-dung">Tới nội dung chính</a>
+
       <header className="shell-head">
         <strong>{content.brand}</strong>
+
+        <nav className="shell-nav" aria-label="Menu chính">
+          {NAV.map((item) => (
+            <a key={item.href} href={item.href}>{item.label}</a>
+          ))}
+        </nav>
+
         <div className="theme-switch" role="group" aria-label="Giao diện">
           {(['light', 'dark', 'system'] as const).map((mode) => (
             <button
@@ -58,11 +75,20 @@ function App() {
 
       <PlaceholderNotice />
 
-      <main>
+      <main id="noi-dung">
         <Hero />
         <Calculator selectedId={selectedProductId} onSelect={setSelectedProductId} />
         <Products onCalculate={calculateProduct} />
+        <Reasons />
+        <Contact />
       </main>
+
+      <footer className="shell-foot">
+        <p>{content.brand} · {content.contact.phoneLabel}</p>
+        <p className="muted">
+          Giá trên trang là giá tham khảo, chưa gồm lắp đặt và vận chuyển.
+        </p>
+      </footer>
     </div>
   )
 }

@@ -26,6 +26,18 @@
 
 export interface SiteContent {
   brand: string;
+  /**
+   * Lý do nên chọn cửa hàng.
+   *
+   * ĐỌC KỸ: những mục mặc định dưới đây chỉ nói về thứ TRANG NÀY làm được —
+   * xem giá ngay, giá khớp báo giá, thông số lấy từ bảng giá thật. Chúng đúng
+   * vì code làm đúng như vậy.
+   *
+   * Muốn thêm "15 năm kinh nghiệm", "bảo hành 10 năm", "5.000 công trình" thì
+   * tự viết và tự chịu trách nhiệm — code không chứng minh được những điều đó,
+   * nên tôi không viết hộ. Để mảng này rỗng thì cả phần bị ẩn.
+   */
+  reasons: Array<{ title: string; body: string }>;
   hero: {
     /** Dòng nhỏ phía trên tiêu đề. Để trống thì không hiện. */
     eyebrow: string;
@@ -50,6 +62,21 @@ export interface SiteContent {
 
 export const content: SiteContent = {
   brand: 'OWIN',
+
+  reasons: [
+    {
+      title: 'Biết giá trước khi gọi',
+      body: 'Chọn sản phẩm, nhập kích thước và số lượng là thấy giá ngay — không phải chờ ai báo lại.',
+    },
+    {
+      title: 'Giá trên web đúng bằng giá báo',
+      body: 'Cùng một sản phẩm và cùng cấu hình thì con số ở đây trùng với báo giá chính thức.',
+    },
+    {
+      title: 'Thông số lấy từ bảng giá thật',
+      body: 'Màu, khung bao, bản cánh, loại kính hiển thị đúng như trong hồ sơ sản phẩm.',
+    },
+  ],
 
   hero: {
     eyebrow: 'Nhôm kính OWIN',
