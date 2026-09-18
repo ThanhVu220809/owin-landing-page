@@ -223,3 +223,112 @@
   font-size: var(--fs-lg);
   font-variant-numeric: tabular-nums;
 }
+
+/* ─── Hero ───
+ * Tối giản, chữ làm chủ đạo. Không parallax, không kính mờ, không gradient
+ * nhiều lớp — UX đứng trên hiệu ứng. */
+.hero {
+  display: grid;
+  gap: var(--space-8);
+  padding: var(--space-8) 0 calc(var(--space-8) * 1.5);
+}
+
+@media (min-width: 900px) {
+  /* Có ảnh thì chia đôi; không ảnh thì chữ chiếm trọn nhưng vẫn giới hạn bề
+     rộng dòng để còn đọc được. */
+  .hero:has(.hero-media) {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+.hero-copy { max-width: 46ch; }
+
+/* Không có ảnh thì căn giữa. Để lệch trái, nửa phải trống hoác trông như ảnh
+ * chưa tải được chứ không phải một lựa chọn bố cục. */
+.hero:not(:has(.hero-media)) .hero-copy {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.hero:not(:has(.hero-media)) .hero-actions { justify-content: center; }
+
+.hero-eyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.hero-description {
+  margin: 0 0 var(--space-6);
+  color: var(--text-muted);
+  font-size: var(--fs-lg);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Nút là <button> và <a> lẫn lộn — ép cùng một hình dạng để không lệch nhau. */
+.hero-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+
+.hero-media {
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* Lời nhắc nội bộ, chỉ tồn tại ở bản phát triển. */
+.placeholder-notice {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--warning);
+  border-radius: var(--r-md);
+  color: var(--warning);
+  font-size: var(--fs-sm);
+}
+
+.placeholder-notice code {
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}

@@ -1,5 +1,8 @@
 import { useState } from 'react'
+import { content } from '@/content'
+import { Hero } from '@/sections/Hero'
 import { Products } from '@/sections/Products'
+import { PlaceholderNotice } from '@/components/PlaceholderNotice'
 import '@/styles/app.css'
 
 type Appearance = 'light' | 'dark' | 'system'
@@ -7,9 +10,9 @@ type Appearance = 'light' | 'dark' | 'system'
 /**
  * Trang công khai.
  *
- * Cố ý CHƯA có Hero, phần "vì sao chọn OWIN", hay liên hệ: chưa có nội dung
- * thật từ chủ cửa hàng thì không được tự nghĩ ra lời hứa kinh doanh nào. Những
- * phần đó vào sau, khi có nội dung.
+ * Chữ trong Hero là nội dung TẠM, chờ chủ cửa hàng thay — tất cả nằm trong
+ * `content.ts`. Phần "vì sao chọn OWIN" vẫn chưa làm: nó đòi những tuyên bố mà
+ * chỉ chủ doanh nghiệp mới được đưa ra.
  */
 function App() {
   const [appearance, setAppearance] = useState<Appearance>('system')
@@ -24,7 +27,7 @@ function App() {
   return (
     <div className="shell">
       <header className="shell-head">
-        <strong>OWIN</strong>
+        <strong>{content.brand}</strong>
         <div className="theme-switch" role="group" aria-label="Giao diện">
           {(['light', 'dark', 'system'] as const).map((mode) => (
             <button
@@ -40,7 +43,10 @@ function App() {
         </div>
       </header>
 
+      <PlaceholderNotice />
+
       <main>
+        <Hero />
         <Products />
       </main>
     </div>
