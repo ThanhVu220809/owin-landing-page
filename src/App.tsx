@@ -84,12 +84,11 @@ function App() {
               <img
                 src={content.brandLogo}
                 alt=""
-                width={38}
-                height={26}
+                width={42}
+                height={38}
                 decoding="async"
               />
             )}
-            <strong>{content.brand}</strong>
           </a>
 
           <nav className="shell-nav" aria-label="Menu chính">
