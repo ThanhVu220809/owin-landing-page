@@ -40,12 +40,7 @@ export function ProductCard({
     <article className="product-card">
       <div className="product-card-media">
         {image ? (
-          <img
-            src={image}
-            alt={product.name}
-            loading="lazy"
-            decoding="async"
-          />
+          <img src={image} alt={product.name} loading="lazy" decoding="async" />
         ) : (
           <span className="product-card-noimage">Chưa có ảnh</span>
         )}
@@ -76,7 +71,7 @@ export function ProductCard({
           className="btn product-card-cta"
           onClick={() => onCalculate(product.id)}
         >
-          Tính giá theo kích thước của bạn
+          Tính giá theo kích thước
         </button>
       </div>
     </article>

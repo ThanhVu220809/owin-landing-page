@@ -13,21 +13,19 @@ import { PostgrestClient } from '@supabase/postgrest-js';
  * quyết định đọc được gì. Trang không tự giới hạn lấy — nó dựa vào hàng rào ở
  * database.
  */
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const url = import.meta.env.VITE_SUPABASE_URL ?? "";
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
 
-if (!url || !anonKey) {
-  throw new Error(
-    'Thiếu VITE_SUPABASE_URL hoặc VITE_SUPABASE_ANON_KEY. Chép .env.example thành .env rồi điền.',
-  );
-}
+export const hasSupabaseConfig = Boolean(url && anonKey);
 
-export const supabase = new PostgrestClient(`${url.replace(/\/+$/, '')}/rest/v1`, {
-  headers: {
-    apikey: anonKey,
-    Authorization: `Bearer ${anonKey}`,
-  },
-});
+export const supabase = hasSupabaseConfig
+  ? new PostgrestClient(`${url.replace(/\/+$/, "")}/rest/v1`, {
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+      },
+    })
+  : null;
 
 /** Cửa hàng mà bản deploy này phục vụ. */
 export const STORE_ID = import.meta.env.VITE_STORE_ID || 'owin';

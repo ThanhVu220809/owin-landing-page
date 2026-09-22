@@ -1,5 +1,5 @@
 import type { ProductRecord } from '@owin/quote-engine';
-import { STORE_ID, supabase } from '@/lib/supabase';
+import { STORE_ID, hasSupabaseConfig, supabase } from "@/lib/supabase";
 
 /**
  * Đọc sản phẩm công khai của cửa hàng mà bản deploy này phục vụ.
@@ -43,12 +43,18 @@ export interface ProductOption {
  * hệt nhau, không biết chọn cái nào.
  */
 export async function fetchProductOptions(): Promise<ProductOption[]> {
+  if (!hasSupabaseConfig || !supabase) {
+    throw new Error(
+      "Thiếu cấu hình Supabase. Vui lòng đặt VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY.",
+    );
+  }
+
   const { data, error } = await supabase
-    .from('products')
-    .select('id,name,category,raw_size_text,unit_price_vnd')
-    .eq('store_id', STORE_ID)
-    .order('sort_order', { ascending: true, nullsFirst: false })
-    .order('code', { ascending: true });
+    .from("products")
+    .select("id,name,category,raw_size_text,unit_price_vnd")
+    .eq("store_id", STORE_ID)
+    .order("sort_order", { ascending: true, nullsFirst: false })
+    .order("code", { ascending: true });
 
   if (error) throw new Error(error.message);
 
@@ -62,8 +68,8 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
     };
     return {
       id: r.id,
-      name: r.name ?? '',
-      category: r.category ?? '',
+      name: r.name ?? "",
+      category: r.category ?? "",
       rawSizeText: r.raw_size_text,
       unitPriceVnd: r.unit_price_vnd,
     };
@@ -82,14 +88,22 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
  * Không ai được chọn thì trả mảng rỗng và trang ẩn hẳn phần đó — chứ không tự
  * lấy bừa mấy sản phẩm đầu danh sách rồi gọi chúng là "nổi bật".
  */
-export async function fetchFeaturedProducts(limit = 8): Promise<ProductRecord[]> {
+export async function fetchFeaturedProducts(
+  limit = 8,
+): Promise<ProductRecord[]> {
+  if (!hasSupabaseConfig || !supabase) {
+    throw new Error(
+      "Thiếu cấu hình Supabase. Vui lòng đặt VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY.",
+    );
+  }
+
   const { data, error } = await supabase
-    .from('products')
-    .select('id,data')
-    .eq('store_id', STORE_ID)
-    .eq('data->>isFeatured', 'true')
-    .order('sort_order', { ascending: true, nullsFirst: false })
-    .order('code', { ascending: true })
+    .from("products")
+    .select("id,data")
+    .eq("store_id", STORE_ID)
+    .eq("data->>isFeatured", "true")
+    .order("sort_order", { ascending: true, nullsFirst: false })
+    .order("code", { ascending: true })
     .limit(limit);
 
   if (error) throw new Error(error.message);
@@ -111,14 +125,25 @@ export async function fetchFeaturedProducts(limit = 8): Promise<ProductRecord[]>
  * Đây là che bớt chứ không phải sửa gốc — gốc là dữ liệu trùng, phải dọn trong
  * tab Sản phẩm. Giữ mục ĐẦU TIÊN để thứ tự kéo-thả của chủ cửa hàng vẫn đúng.
  */
-export function dedupeProductOptions(options: ProductOption[]): ProductOption[] {
+function normalizeOptionKey(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/,/g, ".")
+    .replace(/\s*[*xX]\s*/g, " x ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+export function dedupeProductOptions(
+  options: ProductOption[],
+): ProductOption[] {
   const seen = new Set<string>();
   return options.filter((option) => {
-    const key = [
-      option.name.trim().toLowerCase(),
-      (option.rawSizeText ?? '').trim().toLowerCase(),
-      option.unitPriceVnd ?? '',
-    ].join('|');
+    const key = normalizeOptionKey(option.name);
+    if (!key) return true;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -126,26 +151,43 @@ export function dedupeProductOptions(options: ProductOption[]): ProductOption[] 
 }
 
 /** Tài liệu đầy đủ của một sản phẩm — cần cột `data` mới tính được tiền. */
-export async function fetchProductById(id: string): Promise<ProductRecord | null> {
+export async function fetchProductById(
+  id: string,
+): Promise<ProductRecord | null> {
+  if (!hasSupabaseConfig || !supabase) {
+    throw new Error(
+      "Thiếu cấu hình Supabase. Vui lòng đặt VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY.",
+    );
+  }
+
   const { data, error } = await supabase
-    .from('products')
-    .select('data')
-    .eq('store_id', STORE_ID)
-    .eq('id', id)
+    .from("products")
+    .select("data")
+    .eq("store_id", STORE_ID)
+    .eq("id", id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   return data ? (data as { data: ProductRecord }).data : null;
 }
 
-export async function fetchPublicProducts(offset = 0, limit = PAGE_SIZE): Promise<ProductPage> {
+export async function fetchPublicProducts(
+  offset = 0,
+  limit = PAGE_SIZE,
+): Promise<ProductPage> {
+  if (!hasSupabaseConfig || !supabase) {
+    throw new Error(
+      "Thiếu cấu hình Supabase. Vui lòng đặt VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY.",
+    );
+  }
+
   const { data, error, count } = await supabase
-    .from('products')
-    .select('id,data', { count: 'exact' })
-    .eq('store_id', STORE_ID)
+    .from("products")
+    .select("id,data", { count: "exact" })
+    .eq("store_id", STORE_ID)
     // Cùng thứ tự với tab Sản phẩm: thứ tự kéo-thả do chủ cửa hàng đặt, rồi mã.
-    .order('sort_order', { ascending: true, nullsFirst: false })
-    .order('code', { ascending: true })
+    .order("sort_order", { ascending: true, nullsFirst: false })
+    .order("code", { ascending: true })
     .range(offset, offset + limit - 1);
 
   if (error) throw new Error(error.message);
