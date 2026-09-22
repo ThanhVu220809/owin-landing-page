@@ -18,9 +18,16 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://example-project.supabase.co
+      VITE_SUPABASE_ANON_KEY: example-anon-key
+      VITE_STORE_ID: owin
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout sibling quote-engine dependency
+        run: git clone https://github.com/ThanhVu220809/owin-quote-tool.git ../owin-quote-tool
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
