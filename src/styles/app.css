@@ -12,6 +12,10 @@
  */
 
 /* ─── Layout Shell ─── */
+html {
+  scroll-padding-top: 88px;
+}
+
 .shell {
   max-width: var(--container-max-w);
   margin: 0 auto;
@@ -458,6 +462,7 @@
 
 .section {
   margin-bottom: var(--section-gap);
+  scroll-margin-top: 88px;
 }
 
 .section-head {
