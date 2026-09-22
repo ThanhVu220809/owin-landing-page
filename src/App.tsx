@@ -1,130 +1,224 @@
-import { useState } from 'react'
-import { useSiteContent } from '@/SiteContentContext'
-import { Hero } from '@/sections/Hero'
-import { Calculator } from '@/sections/Calculator'
-import { Featured } from '@/sections/Featured'
-import { Products } from '@/sections/Products'
-import { Reasons } from '@/sections/Reasons'
-import { Contact } from '@/sections/Contact'
-import { PlaceholderNotice } from '@/components/PlaceholderNotice'
-import '@/styles/app.css'
+import { useEffect, useState } from "react";
+import { Menu, Sun, Moon, Laptop, Phone } from "lucide-react";
+import { useSiteContent } from "@/SiteContentContext";
+import { Hero } from "@/sections/Hero";
+import { Calculator } from "@/sections/Calculator";
+import { Featured } from "@/sections/Featured";
+import { Products } from "@/sections/Products";
+import { MaterialStory } from "@/sections/MaterialStory";
+import { Contact } from "@/sections/Contact";
+import { MobileNav } from "@/components/MobileNav";
+import { PlaceholderNotice } from "@/components/PlaceholderNotice";
+import "@/styles/app.css";
 
-type Appearance = 'light' | 'dark' | 'system'
+type Appearance = "light" | "dark" | "system";
 
 const NAV = [
-  { href: '#san-pham', label: 'Sản phẩm' },
-  { href: '#tinh-gia', label: 'Tính giá' },
-  { href: '#lien-he', label: 'Liên hệ' },
-]
+  { href: "#san-pham", label: "Sản phẩm", number: "01" },
+  { href: "#tinh-gia", label: "Tính giá", number: "02" },
+  { href: "#he-nhom", label: "Hệ nhôm", number: "03" },
+  { href: "#lien-he", label: "Liên hệ", number: "04" },
+];
 
-/**
- * Trang công khai.
- *
- * Chữ trên trang đến từ hai nơi: `content.ts` là nội dung mặc định, còn chủ cửa
- * hàng sửa đè lên nó trong công cụ quản trị (mục "Nội dung trang web"). Ô nào
- * họ để trống thì mặc định được dùng.
- */
 function App() {
-  const content = useSiteContent()
-  const [appearance, setAppearance] = useState<Appearance>('system')
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const content = useSiteContent();
+  const [appearance, setAppearance] = useState<Appearance>("system");
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null,
+  );
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("#san-pham");
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
-  /**
-   * Từ thẻ sản phẩm sang bộ tính giá với sản phẩm đã chọn sẵn.
-   *
-   * Cuộn lên là bắt buộc: bộ tính giá nằm PHÍA TRÊN danh sách, nên nếu chỉ đặt
-   * sản phẩm mà không cuộn thì khách bấm nút xong không thấy gì thay đổi.
-   */
+  // Monitor scroll for nav shrink and active section indicator
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+
+      const sections = ["san-pham", "tinh-gia", "he-nhom", "lien-he"];
+      const scrollPos = window.scrollY + 200;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i]);
+        if (el && el.offsetTop <= scrollPos) {
+          setActiveSection(`#${sections[i]}`);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const calculateProduct = (id: string) => {
-    setSelectedProductId(id)
-    document.getElementById('tinh-gia')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+    setSelectedProductId(id);
+    document
+      .getElementById("tinh-gia")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const applyAppearance = (next: Appearance) => {
-    setAppearance(next)
-    const root = document.documentElement
-    if (next === 'system') delete root.dataset.appearance
-    else root.dataset.appearance = next
-  }
+    setAppearance(next);
+    const root = document.documentElement;
+    if (next === "system") delete root.dataset.appearance;
+    else root.dataset.appearance = next;
+  };
 
   return (
     <div className="shell">
-      {/* Người dùng bàn phím không phải đi qua cả menu mới tới nội dung. */}
-      <a className="skip-link" href="#noi-dung">Tới nội dung chính</a>
+      {/* Skip link for keyboard accessibility */}
+      <a className="skip-link" href="#noi-dung">
+        Tới nội dung chính
+      </a>
 
-      <header className="shell-head">
-        <div className="shell-brand">
-          {content.brandLogo && (
-            <img src={content.brandLogo} alt="" width={40} height={27} decoding="async" />
-          )}
-          <strong>{content.brand}</strong>
-        </div>
+      {/* Floating Sticky Architectural Header */}
+      <header className={`shell-head ${isScrolled ? "is-scrolled" : ""}`}>
+        <div className="shell-head-inner">
+          <a
+            href="#"
+            className="shell-brand"
+            aria-label={`Trang chủ ${content.brand}`}
+          >
+            {content.brandLogo && (
+              <img
+                src={content.brandLogo}
+                alt=""
+                width={38}
+                height={26}
+                decoding="async"
+              />
+            )}
+            <strong>{content.brand}</strong>
+          </a>
 
-        <nav className="shell-nav" aria-label="Menu chính">
-          {NAV.map((item) => (
-            <a key={item.href} href={item.href}>{item.label}</a>
-          ))}
-        </nav>
+          <nav className="shell-nav" aria-label="Menu chính">
+            {NAV.map((item) => {
+              const isActive = activeSection === item.href;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`shell-nav-link ${isActive ? "is-active" : ""}`}
+                >
+                  <span className="shell-nav-label">{item.label}</span>
+                  {isActive && (
+                    <span className="shell-nav-indicator" aria-hidden="true" />
+                  )}
+                </a>
+              );
+            })}
+          </nav>
 
-        <div className="theme-switch" role="group" aria-label="Giao diện">
-          {(['light', 'dark', 'system'] as const).map((mode) => (
+          <div className="shell-actions">
+            {/* Appearance Switcher */}
+            <div className="theme-switch" role="group" aria-label="Giao diện">
+              {(["light", "dark", "system"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={appearance === mode}
+                  className={appearance === mode ? "is-active" : undefined}
+                  onClick={() => applyAppearance(mode)}
+                  title={`Chế độ ${mode === "light" ? "sáng" : mode === "dark" ? "tối" : "hệ thống"}`}
+                >
+                  {mode === "light" && <Sun size={14} className="theme-icon" />}
+                  {mode === "dark" && <Moon size={14} className="theme-icon" />}
+                  {mode === "system" && (
+                    <Laptop size={14} className="theme-icon" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Consultation Call CTA */}
+            {content.contact.phone && (
+              <a
+                href={`tel:${content.contact.phone}`}
+                className="btn btn-sm btn-primary nav-call-btn"
+                aria-label={`Gọi ngay: ${content.contact.phoneLabel || content.contact.phone}`}
+              >
+                <Phone size={13} />
+                <span>
+                  {content.contact.phoneLabel || content.contact.phone}
+                </span>
+              </a>
+            )}
+
+            {/* Mobile Menu Trigger */}
             <button
-              key={mode}
               type="button"
-              aria-pressed={appearance === mode}
-              className={appearance === mode ? 'is-active' : undefined}
-              onClick={() => applyAppearance(mode)}
+              className="mobile-menu-trigger"
+              onClick={() => setIsMobileNavOpen(true)}
+              aria-label="Mở menu điều hướng"
             >
-              {mode === 'light' && (
-                <svg className="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2" />
-                  <path d="M12 20v2" />
-                  <path d="m4.93 4.93 1.41 1.41" />
-                  <path d="m17.66 17.66 1.41 1.41" />
-                  <path d="M2 12h2" />
-                  <path d="M20 12h2" />
-                  <path d="m6.34 17.66-1.41 1.41" />
-                  <path d="m19.07 4.93-1.41 1.41" />
-                </svg>
-              )}
-              {mode === 'dark' && (
-                <svg className="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                </svg>
-              )}
-              {mode === 'system' && (
-                <svg className="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect width="20" height="14" x="2" y="3" rx="2" />
-                  <line x1="8" x2="16" y1="21" y2="21" />
-                  <line x1="12" x2="12" y1="17" y2="21" />
-                </svg>
-              )}
-              <span>{mode === 'light' ? 'Sáng' : mode === 'dark' ? 'Tối' : 'Tự động'}</span>
+              <Menu size={20} />
             </button>
-          ))}
+          </div>
         </div>
       </header>
+
+      <MobileNav
+        isOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+        navItems={NAV}
+        activeHref={activeSection}
+        appearance={appearance}
+        onAppearanceChange={applyAppearance}
+        content={content}
+      />
 
       <PlaceholderNotice />
 
       <main id="noi-dung">
+        {/* 1. Cinematic Hero */}
         <Hero />
+
+        {/* Featured Products (if curated) */}
         <Featured onCalculate={calculateProduct} />
-        <Calculator selectedId={selectedProductId} onSelect={setSelectedProductId} />
+
+        {/* 2. Large Product Showcase */}
         <Products onCalculate={calculateProduct} />
-        <Reasons />
+
+        {/* 3. Interactive Quotation Studio */}
+        <Calculator
+          selectedId={selectedProductId}
+          onSelect={setSelectedProductId}
+        />
+
+        {/* 4. Product / Material Storytelling */}
+        <MaterialStory />
+
+        {/* 5. Large Premium CTA & Contact */}
         <Contact />
       </main>
 
+      {/* Minimal Editorial Footer */}
       <footer className="shell-foot">
-        <p>{[content.brand, content.contact.phoneLabel, content.contact.address].filter(Boolean).join(' · ')}</p>
-        <p className="muted">
-          Giá trên trang là giá tham khảo, chưa gồm lắp đặt và vận chuyển.
-        </p>
+        <div className="shell-foot-inner">
+          <div className="shell-foot-brand">
+            <strong>{content.brand}</strong>
+            <p>Hệ thống cửa nhôm kính cao cấp tiêu chuẩn kiến trúc.</p>
+          </div>
+
+          <div className="shell-foot-meta">
+            <p>
+              {[content.contact.phoneLabel, content.contact.address]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            {content.contact.workingHours && (
+              <p>{content.contact.workingHours}</p>
+            )}
+            <p className="shell-foot-disclaimer">
+              Giá hiển thị là số liệu dự toán tham khảo tại xưởng, chưa bao gồm
+              chi phí khảo sát đặc thù và vận chuyển ngoại tỉnh.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
