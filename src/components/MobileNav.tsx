@@ -55,29 +55,39 @@ export function MobileNav({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="mobile-nav-portal" role="dialog" aria-modal="true" aria-label="Menu điều hướng">
+        <div
+          className="mobile-nav-portal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu điều hướng"
+        >
           <motion.div
             className="mobile-nav-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             onClick={onClose}
           />
 
           <motion.div
             className="mobile-nav-panel"
-            initial={{ x: '100%' }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 280 }}
           >
             <div className="mobile-nav-header">
               <div className="mobile-nav-brand">
                 {content.brandLogo && (
-                  <img src={content.brandLogo} alt="" width={32} height={22} decoding="async" />
+                  <img
+                    src={content.brandLogo}
+                    alt=""
+                    width={38}
+                    height={35}
+                    decoding="async"
+                  />
                 )}
-                <strong>{content.brand}</strong>
                 <span className="mobile-nav-badge">Showroom</span>
               </div>
               <button
@@ -97,7 +107,7 @@ export function MobileNav({
                   <motion.a
                     key={item.href}
                     href={item.href}
-                    className={`mobile-nav-link ${isActive ? 'is-active' : ''}`}
+                    className={`mobile-nav-link ${isActive ? "is-active" : ""}`}
                     onClick={(e) => {
                       e.preventDefault();
                       handleLinkClick(item.href);
@@ -117,19 +127,29 @@ export function MobileNav({
             <div className="mobile-nav-footer">
               <div className="mobile-nav-theme">
                 <span className="mobile-nav-label">Giao diện</span>
-                <div className="theme-switch mobile-theme-switch" role="group" aria-label="Giao diện">
-                  {(['light', 'dark', 'system'] as const).map((mode) => (
+                <div
+                  className="theme-switch mobile-theme-switch"
+                  role="group"
+                  aria-label="Giao diện"
+                >
+                  {(["light", "dark", "system"] as const).map((mode) => (
                     <button
                       key={mode}
                       type="button"
                       aria-pressed={appearance === mode}
-                      className={appearance === mode ? 'is-active' : undefined}
+                      className={appearance === mode ? "is-active" : undefined}
                       onClick={() => onAppearanceChange(mode)}
                     >
-                      {mode === 'light' && <Sun size={14} />}
-                      {mode === 'dark' && <Moon size={14} />}
-                      {mode === 'system' && <Laptop size={14} />}
-                      <span>{mode === 'light' ? 'Sáng' : mode === 'dark' ? 'Tối' : 'Tự động'}</span>
+                      {mode === "light" && <Sun size={14} />}
+                      {mode === "dark" && <Moon size={14} />}
+                      {mode === "system" && <Laptop size={14} />}
+                      <span>
+                        {mode === "light"
+                          ? "Sáng"
+                          : mode === "dark"
+                            ? "Tối"
+                            : "Tự động"}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -142,7 +162,10 @@ export function MobileNav({
                   onClick={onClose}
                 >
                   <Phone size={16} />
-                  <span>Gọi tư vấn: {content.contact.phoneLabel || content.contact.phone}</span>
+                  <span>
+                    Gọi tư vấn:{" "}
+                    {content.contact.phoneLabel || content.contact.phone}
+                  </span>
                 </a>
               )}
             </div>

@@ -75,57 +75,59 @@ export interface SiteContent {
     messengerUrl: string;
     address: string;
     workingHours: string;
+    mapUrl?: string;
   };
 }
 
 export const content: SiteContent = {
-  brand: 'OWIN',
-  brandLogo: '/logo.webp',
+  brand: "OWIN",
+  brandLogo: "/logo.webp",
 
   seo: {
-    title: 'OWIN — Cửa nhôm kính, xem giá ngay trên web',
+    title: "OWIN — Cửa nhôm kính, xem giá ngay trên web",
     description:
-      'Cửa chính, cửa sổ, cửa phòng và vách thông tầng hệ nhôm Xingfa, OWIN Lux '
-      + 'Anode. Chọn sản phẩm, nhập kích thước và xem giá tham khảo ngay.',
+      "Cửa chính, cửa sổ, cửa phòng và vách thông tầng hệ nhôm Xingfa, OWIN Lux " +
+      "Anode. Chọn sản phẩm, nhập kích thước và xem giá tham khảo ngay.",
     siteUrl: null,
     ogImage: null,
   },
 
   reasons: [
     {
-      title: 'Biết giá trước khi gọi',
-      body: 'Chọn sản phẩm, nhập kích thước và số lượng là thấy giá ngay — không phải chờ ai báo lại.',
+      title: "Biết giá trước khi gọi",
+      body: "Chọn sản phẩm, nhập kích thước và số lượng là thấy giá ngay — không phải chờ ai báo lại.",
     },
     {
-      title: 'Giá trên web đúng bằng giá báo',
-      body: 'Cùng một sản phẩm và cùng cấu hình thì con số ở đây trùng với báo giá chính thức.',
+      title: "Giá trên web đúng bằng giá báo",
+      body: "Cùng một sản phẩm và cùng cấu hình thì con số ở đây trùng với báo giá chính thức.",
     },
     {
-      title: 'Thông số lấy từ bảng giá thật',
-      body: 'Màu, khung bao, bản cánh, loại kính hiển thị đúng như trong hồ sơ sản phẩm.',
+      title: "Thông số lấy từ bảng giá thật",
+      body: "Màu, khung bao, bản cánh, loại kính hiển thị đúng như trong hồ sơ sản phẩm.",
     },
   ],
 
   hero: {
-    eyebrow: 'Nhôm kính OWIN',
-    title: 'Cửa nhôm cho ngôi nhà của bạn',
+    eyebrow: "Nhôm kính OWIN",
+    title: "Cửa nhôm cho ngôi nhà của bạn",
     description:
-      'Cửa chính, cửa sổ, cửa phòng và vách thông tầng trên các hệ nhôm Xingfa, '
-      + 'OWIN Lux Anode và hệ vát cạnh. Chọn sản phẩm, nhập kích thước, xem giá ngay.',
-    primaryCta: 'Xem sản phẩm',
-    secondaryCta: 'Gọi tư vấn',
-    image: null,
+      "Cửa chính, cửa sổ, cửa phòng và vách thông tầng trên các hệ nhôm Xingfa, " +
+      "OWIN Lux Anode và hệ vát cạnh. Chọn sản phẩm, nhập kích thước, xem giá ngay.",
+    primaryCta: "Xem sản phẩm",
+    secondaryCta: "Gọi tư vấn",
+    image: "/hero.avif",
   },
 
   contact: {
-    phone: '0799040616',
-    phoneLabel: '0799 040 616',
-    zaloUrl: 'https://zalo.me/0799040616',
+    phone: "0799040616",
+    phoneLabel: "0799 040 616",
+    zaloUrl: "https://zalo.me/0799040616",
     // Chưa có Messenger. Chuỗi rỗng nghĩa là KHÔNG CÓ — nút tự ẩn, chứ không
     // trỏ vào một địa chỉ bịa rồi để khách bấm vào chỗ không tồn tại.
-    messengerUrl: '',
-    address: 'Yên Hòa - Tiên Điền - Hà Tĩnh',
-    workingHours: 'T2–T7: 7:00–17:00',
+    messengerUrl: "",
+    address: "Yên Hòa - Tiên Điền - Hà Tĩnh",
+    workingHours: "T2–T7: 7:00–17:00",
+    mapUrl: "https://maps.app.goo.gl/rdGUCA1xoCqKuDv5A",
   },
 };
 

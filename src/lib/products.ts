@@ -171,6 +171,14 @@ export function dedupeProductOptions(
   });
 }
 
+export const INITIAL_PRODUCT_COUNT = 8;
+export const LOAD_MORE_BATCH_SIZE = 16;
+
+export function getLoadMoreCount(total: number, shown: number): number {
+  if (total <= shown) return 0;
+  return Math.min(LOAD_MORE_BATCH_SIZE, total - shown);
+}
+
 /** Tài liệu đầy đủ của một sản phẩm — cần cột `data` mới tính được tiền. */
 export async function fetchProductById(
   id: string,
