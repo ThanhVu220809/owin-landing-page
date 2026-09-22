@@ -1,17 +1,10 @@
 import { useId, useMemo, useState } from 'react';
+import { Search, Check } from 'lucide-react';
 import { formatVnd } from '@/lib/format';
 import type { ProductOption } from '@/lib/products';
 
-/** Danh mục có hơn 300 sản phẩm — dựng hết ra DOM là phí, và cuộn cũng mệt. */
-const MAX_VISIBLE = 40;
+const MAX_VISIBLE = 50;
 
-/**
- * Dòng phụ dưới tên, để phân biệt các sản phẩm TRÙNG TÊN.
- *
- * Nhóm sản phẩm không đủ để phân biệt — nhiều bản cùng tên lẫn cùng nhóm, chỉ
- * khác kích thước mẫu và đơn giá. Đây là đơn giá, không phải giá phải trả; giá
- * đầy đủ hiện ở bảng kết quả sau khi chọn.
- */
 function optionDetail(option: ProductOption): string {
   const parts: string[] = [];
   if (option.category) parts.push(option.category);
@@ -28,12 +21,6 @@ function normalize(text: string): string {
     .toLowerCase();
 }
 
-/**
- * Bộ chọn sản phẩm có ô tìm.
- *
- * Tìm bỏ dấu: gõ "cua so" ra được "Cửa Sổ". Khách trên điện thoại thường không
- * bỏ công gõ dấu, mà không bỏ dấu thì tìm kiểu khớp chuỗi thuần sẽ ra rỗng.
- */
 export function ProductPicker({
   options,
   selectedId,
@@ -44,52 +31,139 @@ export function ProductPicker({
   onSelect: (id: string) => void;
 }) {
   const [query, setQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const inputId = useId();
 
+  // Extract unique categories for quick filter chips
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const opt of options) {
+      if (opt.category && opt.category.trim()) {
+        set.add(opt.category.trim());
+      }
+    }
+    return Array.from(set).sort();
+  }, [options]);
+
   const matches = useMemo(() => {
+    let list = options;
+    if (selectedCategory !== 'all') {
+      list = list.filter((o) => o.category?.trim() === selectedCategory);
+    }
     const q = normalize(query.trim());
-    if (!q) return options;
-    return options.filter((o) => normalize(`${o.name} ${o.category} ${o.rawSizeText ?? ''}`).includes(q));
-  }, [options, query]);
+    if (!q) return list;
+    return list.filter((o) =>
+      normalize(`${o.name} ${o.category} ${o.rawSizeText ?? ''}`).includes(q)
+    );
+  }, [options, selectedCategory, query]);
 
   const visible = matches.slice(0, MAX_VISIBLE);
 
   return (
-    <div className="picker">
-      <label className="field-label" htmlFor={inputId}>Chọn sản phẩm</label>
-      <input
-        id={inputId}
-        className="input"
-        type="search"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Tìm theo tên hoặc nhóm…"
-        autoComplete="off"
-      />
+    <div className="picker studio-picker">
+      <div className="picker-head">
+        <label className="picker-label" htmlFor={inputId}>
+          1. Chọn mẫu sản phẩm
+        </label>
+        <span className="picker-count">{matches.length} mẫu có sẵn</span>
+      </div>
+
+      <div className="picker-search-wrap">
+        <Search size={16} className="picker-search-icon" aria-hidden="true" />
+        <input
+          id={inputId}
+          className="picker-input"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Tìm theo tên cửa, hệ nhôm, quy cách..."
+          autoComplete="off"
+        />
+        {query && (
+          <button
+            type="button"
+            className="picker-search-clear"
+            onClick={() => setQuery('')}
+            aria-label="Xóa từ khóa tìm kiếm"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {categories.length > 0 && (
+        <div className="picker-chips" role="radiogroup" aria-label="Lọc theo nhóm sản phẩm">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedCategory === 'all'}
+            className={`picker-chip ${selectedCategory === 'all' ? 'is-active' : ''}`}
+            onClick={() => setSelectedCategory('all')}
+          >
+            Tất cả ({options.length})
+          </button>
+          {categories.map((cat) => {
+            const count = options.filter((o) => o.category?.trim() === cat).length;
+            const isCatActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                role="radio"
+                aria-checked={isCatActive}
+                className={`picker-chip ${isCatActive ? 'is-active' : ''}`}
+                onClick={() => setSelectedCategory(isCatActive ? 'all' : cat)}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {matches.length === 0 ? (
-        <p className="picker-empty">Không tìm thấy sản phẩm nào khớp.</p>
+        <div className="picker-empty">
+          <p>Không tìm thấy sản phẩm nào khớp với tìm kiếm.</p>
+          <button
+            type="button"
+            className="btn btn-sm btn-subtle"
+            onClick={() => {
+              setQuery('');
+              setSelectedCategory('all');
+            }}
+          >
+            Đặt lại bộ lọc
+          </button>
+        </div>
       ) : (
         <>
           <ul className="picker-list" role="listbox" aria-label="Danh sách sản phẩm">
-            {visible.map((option) => (
-              <li key={option.id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={option.id === selectedId}
-                  className={option.id === selectedId ? 'picker-item is-selected' : 'picker-item'}
-                  onClick={() => onSelect(option.id)}
-                >
-                  <span className="picker-item-name">{option.name}</span>
-                  <span className="picker-item-category">{optionDetail(option)}</span>
-                </button>
-              </li>
-            ))}
+            {visible.map((option) => {
+              const isSelected = option.id === selectedId;
+              return (
+                <li key={option.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`picker-item ${isSelected ? 'is-selected' : ''}`}
+                    onClick={() => onSelect(option.id)}
+                  >
+                    <div className="picker-item-content">
+                      <div className="picker-item-name-row">
+                        <span className="picker-item-name">{option.name}</span>
+                        {isSelected && <Check size={16} className="picker-item-check" />}
+                      </div>
+                      <span className="picker-item-category">{optionDetail(option)}</span>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           {matches.length > visible.length && (
             <p className="picker-more">
-              Còn {matches.length - visible.length} sản phẩm nữa — gõ thêm để thu hẹp.
+              Đang hiện {visible.length}/{matches.length} sản phẩm — gõ thêm từ khóa để tìm chính xác hơn.
             </p>
           )}
         </>

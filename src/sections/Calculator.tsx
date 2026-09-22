@@ -1,21 +1,36 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  Calculator as CalcIcon,
+  Phone,
+  MessageCircle,
+  Send,
+  Ruler,
+  Box,
+  Info,
+  Minus,
+  Plus,
+  ArrowLeft,
+} from "lucide-react";
 import type { ProductRecord } from '@owin/quote-engine';
 import { useSiteContent } from '@/SiteContentContext';
-import { formatVnd, unitLabel } from '@/lib/format';
+import { unitLabel } from '@/lib/format';
+import { listImageUrl } from '@/lib/images';
 import { priceFor } from '@/lib/price';
-import { fetchProductById, fetchProductOptions, type ProductOption } from '@/lib/products';
+import {
+  fetchProductById,
+  fetchProductOptions,
+  normalizeCategory,
+  type ProductOption,
+} from "@/lib/products";
 import { ProductPicker } from '@/components/ProductPicker';
+import { AnimatedPrice } from '@/components/AnimatedPrice';
 
-/**
- * Người Việt gõ số lẻ bằng dấu phẩy ("1,2") nhiều hơn dấu chấm. Nhận cả hai,
- * đừng bắt khách đoán kiểu nào mới đúng.
- */
 function parseNumber(text: string): number {
   const value = Number(text.trim().replace(',', '.'));
   return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
-/** Kích thước mẫu của sản phẩm, để ô nhập không trống trơn lúc mới chọn. */
 function seedSize(product: ProductRecord): { width: string; height: string } {
   const parts = (product.rawSizeText ?? '').split(/\s*[xX*]\s*/);
   if (parts.length < 2) return { width: '', height: '' };
@@ -25,13 +40,6 @@ function seedSize(product: ProductRecord): { width: string; height: string } {
   };
 }
 
-/**
- * Bộ tính giá — trọng tâm của trang.
- *
- * Mọi con số ở đây do `priceFor` tính, tức là đi đúng nhánh Báo giá của engine
- * dùng chung. Không có một công thức nào được viết lại trong file này; chỗ duy
- * nhất file này chạm tới số học là đọc chuỗi người dùng gõ thành số.
- */
 export function Calculator({
   selectedId,
   onSelect,
@@ -45,6 +53,7 @@ export function Calculator({
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
   const [quantity, setQuantity] = useState('1');
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [failed, setFailed] = useState(false);
 
   const widthId = useId();
@@ -55,14 +64,24 @@ export function Calculator({
   useEffect(() => {
     let cancelled = false;
     fetchProductOptions()
-      .then((list) => { if (!cancelled) setOptions(list); })
-      .catch(() => { if (!cancelled) setFailed(true); });
-    return () => { cancelled = true; };
+      .then((list) => {
+        if (!cancelled) setOptions(list);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (!selectedId) { setProduct(null); return; }
+    if (!selectedId) {
+      setProduct(null);
+      return;
+    }
     let cancelled = false;
+    setIsLoadingProduct(true);
     fetchProductById(selectedId)
       .then((record) => {
         if (cancelled || !record) return;
@@ -71,15 +90,22 @@ export function Calculator({
         setWidth(size.width);
         setHeight(size.height);
         setQuantity('1');
-        // Ở khổ hẹp, bộ chọn và bảng kết quả xếp chồng nhau, nên chọn xong thì
-        // giá nằm dưới màn hình — khách bấm một cái rồi tưởng không có gì xảy
-        // ra. Khổ rộng thì hai bên nằm cạnh nhau, không cần cuộn.
         if (window.innerWidth < 860) {
-          panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          panelRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
         }
       })
-      .catch(() => { if (!cancelled) setFailed(true); });
-    return () => { cancelled = true; };
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingProduct(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [selectedId]);
 
   const needsSize = product ? product.unit !== 'BO' : false;
@@ -87,8 +113,6 @@ export function Calculator({
 
   const price = useMemo(() => {
     if (!product) return null;
-    // Sản phẩm bán theo bộ thì engine bỏ qua kích thước — không cần chặn ở đây,
-    // nhưng cũng đừng gửi số rác xuống.
     return priceFor(product, {
       widthM: needsSize ? parseNumber(width) : null,
       heightM: needsSize ? parseNumber(height) : null,
@@ -101,7 +125,9 @@ export function Calculator({
   if (failed) {
     return (
       <section className="section" id="tinh-gia">
-        <p className="notice" role="alert">Không tải được dữ liệu sản phẩm. Vui lòng thử lại sau.</p>
+        <div className="arch-notice" role="alert">
+          <p>Không tải được dữ liệu sản phẩm. Vui lòng thử lại sau.</p>
+        </div>
       </section>
     );
   }
@@ -109,107 +135,342 @@ export function Calculator({
   if (options.length === 0) return null;
 
   return (
-    <section className="section calculator" id="tinh-gia" aria-labelledby="tinh-gia-title">
-      <header className="section-head">
-        <h2 id="tinh-gia-title">Tính giá nhanh</h2>
-        <p className="muted">Chọn sản phẩm, nhập kích thước và số lượng để xem giá ngay.</p>
-      </header>
+    <section
+      className="section quotation-studio"
+      id="tinh-gia"
+      aria-labelledby="tinh-gia-title"
+    >
+      <div className="section-head">
+        <span className="eyebrow-chip">
+          <CalcIcon size={13} className="eyebrow-icon" />
+          Xưởng tính giá trực tuyến
+        </span>
+        <h2 id="tinh-gia-title" className="arch-section-title">
+          Báo giá dự toán kiến trúc tức thì
+        </h2>
+        <p className="arch-section-desc">
+          Công thức tính đồng bộ theo hệ thống báo giá xưởng. Chọn quy cách cửa,
+          nhập số đo thực tế để có con số dự toán minh bạch.
+        </p>
+      </div>
 
-      <div className="calculator-grid">
-        <ProductPicker options={options} selectedId={selectedId} onSelect={onSelect} />
+      <div className={`studio-layout ${product ? "has-selection" : ""}`}>
+        {/* Left Column: Interactive Product Picker */}
+        <ProductPicker
+          options={options}
+          selectedId={selectedId}
+          onSelect={onSelect}
+        />
 
-        <div className="calculator-panel" ref={panelRef}>
-          {!product ? (
-            <p className="calculator-hint">Chọn một sản phẩm ở bên để bắt đầu.</p>
-          ) : (
-            <>
-              <h3 className="calculator-product">{product.name}</h3>
-
-              <div className="calculator-inputs">
-                {needsSize && (
-                  <>
-                    <div className="field">
-                      <label className="field-label" htmlFor={widthId}>Rộng (m)</label>
-                      <input
-                        id={widthId}
-                        className="input"
-                        inputMode="decimal"
-                        value={width}
-                        onChange={(event) => setWidth(event.target.value)}
-                        placeholder="1,2"
-                      />
-                    </div>
-                    <div className="field">
-                      <label className="field-label" htmlFor={heightId}>Cao (m)</label>
-                      <input
-                        id={heightId}
-                        className="input"
-                        inputMode="decimal"
-                        value={height}
-                        onChange={(event) => setHeight(event.target.value)}
-                        placeholder="2,2"
-                      />
-                    </div>
-                  </>
-                )}
-                <div className="field">
-                  <label className="field-label" htmlFor={quantityId}>Số lượng</label>
-                  <input
-                    id={quantityId}
-                    className="input"
-                    inputMode="numeric"
-                    value={quantity}
-                    onChange={(event) => setQuantity(event.target.value)}
-                    placeholder="1"
-                  />
-                </div>
-              </div>
-
-              {!needsSize && (
-                <p className="calculator-note">
-                  Sản phẩm bán theo {unitLabel(product.unit).toLowerCase()} — giá không phụ thuộc kích thước.
-                </p>
+        {/* Right Column: Dynamic Calculation Workbench */}
+        <div className="studio-workbench" ref={panelRef}>
+          <div className="workbench-inner">
+            <div className="workbench-head">
+              <span className="workbench-step">
+                2. Thiết lập quy cách & Dự toán
+              </span>
+              {product && (
+                <button
+                  type="button"
+                  className="workbench-change"
+                  onClick={() => onSelect("")}
+                >
+                  <ArrowLeft size={14} />
+                  <span>Đổi mẫu</span>
+                </button>
               )}
+              {isLoadingProduct && (
+                <span className="workbench-loading-badge">
+                  Đang cập nhật...
+                </span>
+              )}
+            </div>
 
-              {sizeMissing ? (
-                <p className="calculator-hint">Nhập chiều rộng và chiều cao để xem giá.</p>
-              ) : price && (
-                <div className="calculator-result" aria-live="polite">
-                  <div className="calculator-line">
-                    <span>Tiền sản phẩm</span>
-                    <strong>{formatVnd(price.productVnd)}</strong>
+            <AnimatePresence mode="wait">
+              {!product ? (
+                <motion.div
+                  key="empty-state"
+                  className="workbench-empty-state"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="empty-icon-wrap">
+                    <Ruler size={32} />
                   </div>
-                  {price.accessoryVnd > 0 && (
-                    <div className="calculator-line">
-                      <span>Phụ kiện đi kèm</span>
-                      <strong>{formatVnd(price.accessoryVnd)}</strong>
+                  <h4 className="empty-title">Chưa chọn sản phẩm</h4>
+                  <p className="empty-desc">
+                    Vui lòng chọn một mẫu cửa từ danh sách bên trái (hoặc bấm
+                    &ldquo;Tính giá&rdquo; ở danh mục sản phẩm) để nhập kích
+                    thước và xem báo giá.
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={product.id}
+                  className="workbench-content"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{
+                    duration: 0.35,
+                    ease: [0.16, 1, 0.3, 1] as const,
+                  }}
+                >
+                  <div className="workbench-product-header">
+                    {listImageUrl(product.coverImagePath) && (
+                      <div className="workbench-product-thumb">
+                        <img
+                          src={listImageUrl(product.coverImagePath)!}
+                          alt={product.name}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    )}
+                    <div className="workbench-product-info">
+                      <div className="workbench-product-tag">
+                        {normalizeCategory(product.category) || "Cửa nhôm kính"}
+                      </div>
+                      <h3 className="workbench-product-title">
+                        {product.name}
+                      </h3>
+                      {product.code && (
+                        <span className="workbench-product-code">
+                          Mã: {product.code}
+                        </span>
+                      )}
                     </div>
+                  </div>
+
+                  <div className="workbench-form">
+                    {needsSize && (
+                      <div className="workbench-input-row">
+                        <div className="studio-field">
+                          <label className="studio-label" htmlFor={widthId}>
+                            Chiều rộng (m)
+                          </label>
+                          <div className="studio-input-wrap">
+                            <button
+                              type="button"
+                              className="studio-stepper"
+                              onClick={() =>
+                                setWidth(
+                                  Math.max(0.1, parseNumber(width) - 0.1)
+                                    .toFixed(2)
+                                    .replace(".", ","),
+                                )
+                              }
+                              aria-label="Giảm chiều rộng"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input
+                              id={widthId}
+                              className="studio-input"
+                              inputMode="decimal"
+                              value={width}
+                              onChange={(e) => setWidth(e.target.value)}
+                              placeholder="1,2"
+                            />
+                            <button
+                              type="button"
+                              className="studio-stepper"
+                              onClick={() =>
+                                setWidth(
+                                  (parseNumber(width) + 0.1)
+                                    .toFixed(2)
+                                    .replace(".", ","),
+                                )
+                              }
+                              aria-label="Tăng chiều rộng"
+                            >
+                              <Plus size={14} />
+                            </button>
+                            <span className="studio-unit">mét</span>
+                          </div>
+                        </div>
+
+                        <div className="studio-field">
+                          <label className="studio-label" htmlFor={heightId}>
+                            Chiều cao (m)
+                          </label>
+                          <div className="studio-input-wrap">
+                            <button
+                              type="button"
+                              className="studio-stepper"
+                              onClick={() =>
+                                setHeight(
+                                  Math.max(0.1, parseNumber(height) - 0.1)
+                                    .toFixed(2)
+                                    .replace(".", ","),
+                                )
+                              }
+                              aria-label="Giảm chiều cao"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input
+                              id={heightId}
+                              className="studio-input"
+                              inputMode="decimal"
+                              value={height}
+                              onChange={(e) => setHeight(e.target.value)}
+                              placeholder="2,2"
+                            />
+                            <button
+                              type="button"
+                              className="studio-stepper"
+                              onClick={() =>
+                                setHeight(
+                                  (parseNumber(height) + 0.1)
+                                    .toFixed(2)
+                                    .replace(".", ","),
+                                )
+                              }
+                              aria-label="Tăng chiều cao"
+                            >
+                              <Plus size={14} />
+                            </button>
+                            <span className="studio-unit">mét</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="workbench-input-row">
+                      <div className="studio-field">
+                        <label className="studio-label" htmlFor={quantityId}>
+                          Số lượng bộ
+                        </label>
+                        <div className="studio-input-wrap">
+                          <input
+                            id={quantityId}
+                            className="studio-input"
+                            inputMode="numeric"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="1"
+                          />
+                          <span className="studio-unit">bộ</span>
+                        </div>
+                      </div>
+
+                      {!needsSize && (
+                        <div className="studio-unit-note">
+                          <Box size={16} />
+                          <span>
+                            Sản phẩm tính theo{" "}
+                            {unitLabel(product.unit).toLowerCase()} (trọn gói)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {sizeMissing ? (
+                    <div className="workbench-prompt">
+                      <Info size={16} />
+                      <span>
+                        Nhập kích thước chiều rộng và chiều cao để hệ thống tính
+                        giá.
+                      </span>
+                    </div>
+                  ) : (
+                    price && (
+                      <motion.div
+                        className="workbench-summary"
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <div className="summary-row">
+                          <span className="summary-label">
+                            Đơn giá thân cửa
+                          </span>
+                          <AnimatedPrice
+                            value={price.productVnd}
+                            className="summary-val"
+                          />
+                        </div>
+
+                        {price.accessoryVnd > 0 && (
+                          <div className="summary-row">
+                            <span className="summary-label">
+                              Phụ kiện kim khí đồng bộ
+                            </span>
+                            <AnimatedPrice
+                              value={price.accessoryVnd}
+                              className="summary-val"
+                            />
+                          </div>
+                        )}
+
+                        <div className="summary-total-row">
+                          <div>
+                            <span className="total-title">
+                              Tạm tính dự toán
+                            </span>
+                            <span className="total-subtitle">
+                              {needsSize
+                                ? `(${parseNumber(width).toFixed(2)}m × ${parseNumber(height).toFixed(2)}m × ${qty} bộ)`
+                                : `(${qty} bộ)`}
+                            </span>
+                          </div>
+                          <AnimatedPrice
+                            value={price.displayVnd}
+                            className="total-price"
+                          />
+                        </div>
+                      </motion.div>
+                    )
                   )}
-                  <div className="calculator-line calculator-total">
-                    <span>Tạm tính</span>
-                    <strong>{formatVnd(price.displayVnd)}</strong>
+
+                  <div className="workbench-notice">
+                    <p>
+                      * Giá dự toán tham khảo chưa bao gồm chi phí vận chuyển
+                      ngoại tỉnh và nhân công lắp đặt đặc thù. Kỹ thuật viên sẽ
+                      khảo sát hiện trường trước khi ký hợp đồng.
+                    </p>
                   </div>
-                </div>
+
+                  <div className="workbench-actions">
+                    {contact.phone && (
+                      <a
+                        className="btn btn-primary btn-wb"
+                        href={`tel:${contact.phone}`}
+                      >
+                        <Phone size={16} />
+                        <span>Gọi đặt lịch khảo sát</span>
+                      </a>
+                    )}
+                    {contact.zaloUrl && (
+                      <a
+                        className="btn btn-secondary btn-wb"
+                        href={contact.zaloUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Send size={15} />
+                        <span>Gửi kích thước qua Zalo</span>
+                      </a>
+                    )}
+                    {contact.messengerUrl && (
+                      <a
+                        className="btn btn-secondary btn-wb"
+                        href={contact.messengerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle size={15} />
+                        <span>Messenger</span>
+                      </a>
+                    )}
+                  </div>
+                </motion.div>
               )}
-
-              <p className="calculator-disclaimer">
-                Giá tham khảo, chưa gồm lắp đặt và vận chuyển. Số cuối cùng theo khảo sát thực tế.
-              </p>
-
-              {/* Kênh nào để trống thì không hiện nút — xem `Contact.tsx`. */}
-              <div className="calculator-actions">
-                {contact.phone && (
-                  <a className="btn btn-primary" href={`tel:${contact.phone}`}>Gọi</a>
-                )}
-                {contact.zaloUrl && (
-                  <a className="btn" href={contact.zaloUrl} target="_blank" rel="noopener noreferrer">Zalo</a>
-                )}
-                {contact.messengerUrl && (
-                  <a className="btn" href={contact.messengerUrl} target="_blank" rel="noopener noreferrer">Messenger</a>
-                )}
-              </div>
-            </>
-          )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { dedupeProductOptions, type ProductOption } from '@/lib/products';
+import {
+  dedupeProductOptions,
+  normalizeCategory,
+  type ProductOption,
+} from "@/lib/products";
 
 function option(
   id: string,
@@ -77,5 +81,12 @@ describe('dedupeProductOptions', () => {
       option('b', 'Bộ phụ kiện', null, null),
     ]);
     expect(result).toHaveLength(1);
+  });
+});
+
+describe("normalizeCategory", () => {
+  it("chuẩn hóa hoa thường và dấu phân cách danh mục", () => {
+    expect(normalizeCategory("  cửa chính  ")).toBe("Cửa Chính");
+    expect(normalizeCategory("cửa phụ ,wc")).toBe("Cửa Phụ / WC");
   });
 });

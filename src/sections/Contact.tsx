@@ -1,59 +1,78 @@
+import { Phone, MessageSquare, Send, MapPin, Clock } from 'lucide-react';
 import { useSiteContent } from '@/SiteContentContext';
 
-/**
- * Liên hệ.
- *
- * Ba nút, không form, không ghi gì xuống database — khách nhắn thẳng qua kênh
- * họ vốn đã dùng. Form liên hệ sẽ kéo theo chuyện lưu trữ dữ liệu cá nhân mà
- * trang chỉ-đọc này cố tình không đụng tới.
- *
- * Kênh nào để trống thì **không hiện nút** của kênh đó. Nút trỏ vào một địa chỉ
- * bịa còn tệ hơn là không có nút: khách bấm vào rồi rơi vào chỗ không tồn tại.
- */
 export function Contact() {
   const { contact } = useSiteContent();
 
   const details = [
-    { label: 'Địa chỉ', value: contact.address },
-    { label: 'Giờ làm việc', value: contact.workingHours },
+    { label: 'Địa chỉ xưởng & showroom', value: contact.address, icon: MapPin },
+    { label: 'Giờ làm việc & tư vấn', value: contact.workingHours, icon: Clock },
   ].filter((row) => row.value);
 
   return (
-    <section className="section" id="lien-he" aria-labelledby="lien-he-title">
-      <div className="contact-card">
-        <header className="section-head">
-          <h2 id="lien-he-title">Liên hệ</h2>
-          <p className="muted">Gửi kích thước và nhu cầu, chúng tôi báo giá chi tiết.</p>
-        </header>
+    <section className="section contact-premium-section" id="lien-he" aria-labelledby="lien-he-title">
+      <div className="contact-premium-card">
+        <div className="contact-ambient-glow" aria-hidden="true" />
 
-        <div className="contact-actions">
-          {contact.phone && (
-            <a className="btn btn-primary" href={`tel:${contact.phone}`}>
-              Gọi {contact.phoneLabel || contact.phone}
-            </a>
-          )}
-          {contact.zaloUrl && (
-            <a className="btn" href={contact.zaloUrl} target="_blank" rel="noopener noreferrer">
-              Zalo
-            </a>
-          )}
-          {contact.messengerUrl && (
-            <a className="btn" href={contact.messengerUrl} target="_blank" rel="noopener noreferrer">
-              Messenger
-            </a>
+        <div className="contact-premium-content">
+          <span className="eyebrow-chip">Đồng hành cùng công trình</span>
+          <h2 id="lien-he-title" className="contact-premium-title">
+            Khởi tạo giải pháp cửa cho không gian của bạn
+          </h2>
+          <p className="contact-premium-desc">
+            Gửi bản vẽ kiến trúc hoặc kích thước sơ bộ, đội ngũ kỹ thuật OWIN sẽ hỗ trợ bóc tách khối lượng, tư vấn hệ nhôm phù hợp và gửi bảng dự toán hoàn chỉnh.
+          </p>
+
+          <div className="contact-premium-actions">
+            {contact.phone && (
+              <a className="btn btn-primary btn-lg" href={`tel:${contact.phone}`}>
+                <Phone size={18} />
+                <span>Gọi kỹ thuật: {contact.phoneLabel || contact.phone}</span>
+              </a>
+            )}
+            {contact.zaloUrl && (
+              <a
+                className="btn btn-secondary btn-lg"
+                href={contact.zaloUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Send size={18} />
+                <span>Tư vấn qua Zalo</span>
+              </a>
+            )}
+            {contact.messengerUrl && (
+              <a
+                className="btn btn-secondary btn-lg"
+                href={contact.messengerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageSquare size={18} />
+                <span>Nhắn qua Messenger</span>
+              </a>
+            )}
+          </div>
+
+          {details.length > 0 && (
+            <div className="contact-premium-meta">
+              {details.map((row) => {
+                const Icon = row.icon;
+                return (
+                  <div key={row.label} className="contact-meta-box">
+                    <div className="contact-meta-icon-wrap">
+                      <Icon size={16} />
+                    </div>
+                    <div>
+                      <div className="contact-meta-label">{row.label}</div>
+                      <div className="contact-meta-val">{row.value}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
-
-        {details.length > 0 && (
-          <dl className="contact-details">
-            {details.map((row) => (
-              <div key={row.label}>
-                <dt>{row.label}</dt>
-                <dd>{row.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
       </div>
     </section>
   );

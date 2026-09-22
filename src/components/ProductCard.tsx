@@ -1,30 +1,24 @@
+import { useState } from 'react';
+import { motion } from 'motion/react';
+import { ArrowRight, ImageOff } from 'lucide-react';
 import type { ProductRecord } from '@owin/quote-engine';
 import { listImageUrl } from '@/lib/images';
 import { formatVnd } from '@/lib/format';
 import { priceFor } from '@/lib/price';
+import { normalizeCategory } from "@/lib/products";
 
 const MAX_SPECS = 3;
 
 /**
  * Nhãn nói rõ con số đang là giá của CÁI GÌ.
- *
- * `rawSizeText` là kích thước tính bằng MÉT ("2.80 x 2.80"), không phải diện
- * tích — nên không được ghép nhãn đơn vị `m²` vào sau nó. Sản phẩm bán theo bộ
- * thì không có kích thước để nói.
+ * Giữ nguyên logic chặt chẽ của hệ thống.
  */
 function priceLabel(product: ProductRecord): string {
-  if (product.unit === 'BO') return 'Giá tham khảo · trọn bộ';
-  if (!product.rawSizeText) return 'Giá tham khảo';
-  return `Giá tham khảo · kích thước mẫu ${product.rawSizeText.replace(/\./g, ',')} m`;
+  if (product.unit === 'BO') return 'Trọn bộ tiêu chuẩn';
+  if (!product.rawSizeText) return 'Đơn giá tham khảo';
+  return `Kích thước mẫu ${product.rawSizeText.replace(/\./g, ',')} m`;
 }
 
-/**
- * Một sản phẩm trong danh sách.
- *
- * Chỉ hiển thị những gì dữ liệu thật CÓ. Sản phẩm không có ảnh thì để ô trống
- * có nhãn, không dùng ảnh thay thế; không có thông số thì bỏ hàng thông số.
- * Không bịa mô tả, không bịa lời quảng cáo.
- */
 export function ProductCard({
   product,
   onCalculate,
@@ -32,48 +26,88 @@ export function ProductCard({
   product: ProductRecord;
   onCalculate: (id: string) => void;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   const image = listImageUrl(product.coverImagePath);
   const price = priceFor(product);
   const specs = (product.specs ?? []).slice(0, MAX_SPECS);
 
   return (
-    <article className="product-card">
-      <div className="product-card-media">
+    <motion.article
+      className="arch-product-card"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] as const }}
+    >
+      <div className="arch-card-media">
         {image ? (
-          <img src={image} alt={product.name} loading="lazy" decoding="async" />
+          <img
+            src={image}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            className="arch-card-img"
+          />
         ) : (
-          <span className="product-card-noimage">Chưa có ảnh</span>
+          <div className="arch-card-noimage">
+            <ImageOff size={20} className="noimage-icon" />
+            <span>Chưa có ảnh</span>
+          </div>
+        )}
+        {product.category && (
+          <span className="arch-card-category-tag">
+            {normalizeCategory(product.category)}
+          </span>
         )}
       </div>
 
-      <div className="product-card-body">
-        <div className="product-card-category">{product.category}</div>
-        <h3 className="product-card-name">{product.name}</h3>
+      <div className="arch-card-body">
+        <h3 className="arch-card-title" title={product.name}>
+          {product.name}
+        </h3>
 
-        {specs.length > 0 && (
-          <dl className="product-card-specs">
-            {specs.map((spec) => (
-              <div key={spec.key}>
-                <dt>{spec.key}</dt>
-                <dd>{spec.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-
-        <div className="product-card-price">
-          <div className="product-card-price-label">{priceLabel(product)}</div>
-          <strong>{formatVnd(price.displayVnd)}</strong>
+        <div className="arch-card-specs">
+          {specs.map((spec) => (
+            <div key={spec.key} className="arch-spec-row">
+              <dt>{spec.key}</dt>
+              <dd title={spec.value}>{spec.value}</dd>
+            </div>
+          ))}
+          {specs.length === 0 && (
+            <div className="arch-spec-row">
+              <dt>Tiêu chuẩn</dt>
+              <dd>Định hình chuẩn kiến trúc</dd>
+            </div>
+          )}
         </div>
 
-        <button
-          type="button"
-          className="btn product-card-cta"
-          onClick={() => onCalculate(product.id)}
-        >
-          Tính giá theo kích thước
-        </button>
+        <div className="arch-card-footer">
+          <div className="arch-price-block">
+            <span className="arch-price-label">{priceLabel(product)}</span>
+            <strong className="arch-price-value">
+              {formatVnd(price.displayVnd)}
+            </strong>
+          </div>
+
+          <button
+            type="button"
+            className="arch-card-btn"
+            onClick={() => onCalculate(product.id)}
+            aria-label={`Tính giá cho ${product.name}`}
+          >
+            <span>Tính giá</span>
+            <motion.span
+              animate={{ x: isHovered ? 3 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="arch-btn-arrow-wrap"
+            >
+              <ArrowRight size={14} />
+            </motion.span>
+          </button>
+        </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
