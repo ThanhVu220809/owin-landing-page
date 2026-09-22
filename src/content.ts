@@ -9,9 +9,9 @@
  * ---------------------------------------------------------------------------
  * ĐỌC TRƯỚC KHI ĐƯA LÊN MẠNG
  * ---------------------------------------------------------------------------
- * Số điện thoại, Zalo và địa chỉ đã là THẬT. Messenger và giờ làm việc để
- * TRỐNG — chuỗi rỗng nghĩa là "không có", nên nút Messenger và dòng giờ làm
- * việc tự ẩn. Điền vào là chúng hiện ra, không phải sửa code.
+ * Số điện thoại, Zalo, địa chỉ và giờ làm việc đã là THẬT. Chỉ còn Messenger
+ * để TRỐNG — chuỗi rỗng nghĩa là "không có", nên nút Messenger tự ẩn. Điền vào
+ * là nó hiện ra, không phải sửa code.
  *
  * Phần chữ mô tả cố ý KHÔNG chứa con số hay lời hứa nào: không "15 năm kinh
  * nghiệm", không "5.000 công trình", không "bảo hành 10 năm". Những câu đó nghe
@@ -125,7 +125,7 @@ export const content: SiteContent = {
     // trỏ vào một địa chỉ bịa rồi để khách bấm vào chỗ không tồn tại.
     messengerUrl: '',
     address: 'Yên Hòa - Tiên Điền - Hà Tĩnh',
-    workingHours: '',
+    workingHours: 'T2–T7: 7:00–17:00',
   },
 };
 

@@ -60,7 +60,17 @@ export function buildHeadTags(content: SiteContent): string[] {
     // Chỉ khai trường nào thật sự có. Phát ra `"address": ""` là khẳng định với
     // máy rằng cửa hàng có địa chỉ rỗng, tệ hơn là không nói gì về địa chỉ.
     if (content.contact.address) business.address = content.contact.address;
-    if (content.contact.workingHours) business.openingHours = content.contact.workingHours;
+
+    // CỐ Ý KHÔNG khai `openingHours`.
+    //
+    // schema.org đòi dạng máy đọc được — `Mo-Sa 07:00-17:00`. Giờ làm việc trên
+    // trang là chữ cho người đọc ("T2–T7: 7:00–17:00"), do chủ cửa hàng tự gõ
+    // nên viết kiểu gì cũng có. Đổ thẳng chuỗi đó vào đây là phát ra dữ liệu
+    // sai định dạng, còn tệ hơn không khai; mà thêm một trường riêng đúng định
+    // dạng thì lại thành hai nơi phải nhớ sửa cùng lúc, và sẽ lệch ngay lần đầu
+    // chủ cửa hàng đổi giờ trong công cụ quản trị.
+    //
+    // Giờ làm việc vẫn hiện đầy đủ cho KHÁCH ở phần Liên hệ.
     if (seo.siteUrl) business.url = seo.siteUrl;
     if (seo.ogImage) business.image = seo.ogImage;
     // `</script>` lọt vào trong JSON sẽ đóng sớm thẻ script và biến phần còn lại

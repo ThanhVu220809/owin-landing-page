@@ -72,12 +72,19 @@ describe('buildHeadTags', () => {
   it('bỏ qua trường rỗng trong dữ liệu có cấu trúc', () => {
     // `"address": ""` là khẳng định rằng cửa hàng có địa chỉ rỗng — tệ hơn là
     // không nói gì về địa chỉ.
-    const html = buildHeadTags(
-      withSeo({}, { ...REAL_CONTACT, address: '', workingHours: '' }),
-    ).join('\n');
+    const html = buildHeadTags(withSeo({}, { ...REAL_CONTACT, address: '' })).join('\n');
     expect(html).toContain('application/ld+json');
     expect(html).not.toContain('"address"');
-    expect(html).not.toContain('"openingHours"');
+  });
+
+  it('KHÔNG BAO GIỜ khai openingHours, kể cả khi đã có giờ làm việc', () => {
+    // schema.org đòi dạng `Mo-Sa 07:00-17:00`; giờ trên trang là chữ cho người
+    // đọc và do chủ cửa hàng tự gõ. Đổ thẳng vào là dữ liệu sai định dạng.
+    const html = buildHeadTags(
+      withSeo({}, { ...REAL_CONTACT, workingHours: 'T2–T7: 7:00–17:00' }),
+    ).join('\n');
+    expect(html).toContain('application/ld+json');
+    expect(html).not.toContain('openingHours');
   });
 
   it('phát dữ liệu có cấu trúc khi số liên hệ đã thật', () => {
