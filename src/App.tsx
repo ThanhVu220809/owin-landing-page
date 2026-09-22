@@ -53,7 +53,12 @@ function App() {
       <a className="skip-link" href="#noi-dung">Tới nội dung chính</a>
 
       <header className="shell-head">
-        <strong>{content.brand}</strong>
+        <div className="shell-brand">
+          {content.brandLogo && (
+            <img src={content.brandLogo} alt="" width={40} height={27} decoding="async" />
+          )}
+          <strong>{content.brand}</strong>
+        </div>
 
         <nav className="shell-nav" aria-label="Menu chính">
           {NAV.map((item) => (
@@ -88,7 +93,7 @@ function App() {
       </main>
 
       <footer className="shell-foot">
-        <p>{content.brand} · {content.contact.phoneLabel}</p>
+        <p>{[content.brand, content.contact.phoneLabel, content.contact.address].filter(Boolean).join(' · ')}</p>
         <p className="muted">
           Giá trên trang là giá tham khảo, chưa gồm lắp đặt và vận chuyển.
         </p>

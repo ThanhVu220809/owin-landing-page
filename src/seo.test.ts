@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { content, type SiteContent } from '@/content';
 import { buildHeadTags } from '@/seo';
 
+const FAKE_CONTACT: SiteContent['contact'] = {
+  phone: '0000000000',
+  phoneLabel: '0000 000 000',
+  zaloUrl: 'https://zalo.me/0000000000',
+  messengerUrl: 'https://m.me/example',
+  address: '',
+  workingHours: '',
+};
+
 const REAL_CONTACT: SiteContent['contact'] = {
   phone: '0912345678',
   phoneLabel: '0912 345 678',
@@ -47,8 +56,28 @@ describe('buildHeadTags', () => {
   it('KHÔNG phát dữ liệu có cấu trúc khi số liên hệ còn là số giả', () => {
     // Đây là khẳng định máy đọc được về một doanh nghiệp có thật. Khai số giả
     // còn tệ hơn là không khai gì.
-    const html = buildHeadTags(content).join('\n');
+    //
+    // Dựng số giả ngay trong test chứ không dựa vào nội dung mặc định: mặc định
+    // đã là số thật rồi, và test bám vào đó thì chỉ đo được "hôm nay dữ liệu
+    // đang thế nào" chứ không đo được hành vi cần giữ.
+    const html = buildHeadTags(withSeo({}, FAKE_CONTACT)).join('\n');
     expect(html).not.toContain('application/ld+json');
+  });
+
+  it('phát dữ liệu có cấu trúc với nội dung mặc định hiện tại', () => {
+    // Số liên hệ đã thật, nên phần này phải BẬT.
+    expect(buildHeadTags(content).join('\n')).toContain('"telephone":"0799040616"');
+  });
+
+  it('bỏ qua trường rỗng trong dữ liệu có cấu trúc', () => {
+    // `"address": ""` là khẳng định rằng cửa hàng có địa chỉ rỗng — tệ hơn là
+    // không nói gì về địa chỉ.
+    const html = buildHeadTags(
+      withSeo({}, { ...REAL_CONTACT, address: '', workingHours: '' }),
+    ).join('\n');
+    expect(html).toContain('application/ld+json');
+    expect(html).not.toContain('"address"');
+    expect(html).not.toContain('"openingHours"');
   });
 
   it('phát dữ liệu có cấu trúc khi số liên hệ đã thật', () => {

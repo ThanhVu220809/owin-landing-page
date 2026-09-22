@@ -55,6 +55,7 @@ export function mergeSiteContent(base: SiteContent, document: unknown): SiteCont
   return {
     ...base,
     brand: pick(brand.name, base.brand),
+    brandLogo: base.brandLogo,
     hero: {
       eyebrow: pick(hero.eyebrow, base.hero.eyebrow),
       title: pick(hero.title, base.hero.title),

@@ -25,9 +25,11 @@ export function Hero() {
           <button type="button" className="btn btn-primary" onClick={scrollToProducts}>
             {hero.primaryCta}
           </button>
-          <a className="btn" href={`tel:${contact.phone}`}>
-            {hero.secondaryCta}
-          </a>
+          {contact.phone && (
+            <a className="btn" href={`tel:${contact.phone}`}>
+              {hero.secondaryCta}
+            </a>
+          )}
         </div>
       </div>
 

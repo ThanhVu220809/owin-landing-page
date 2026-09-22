@@ -14,7 +14,24 @@
   margin-bottom: var(--space-8);
 }
 
-.shell-head > strong {
+.shell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Logo có nền trong suốt và mực sẫm — ở chế độ tối nó gần như biến mất, nên
+   lót một mảng sáng phía sau thay vì đảo màu ảnh. */
+.shell-brand img {
+  display: block;
+  width: auto;
+  height: 28px;
+  padding: 3px 5px;
+  border-radius: var(--r-sm);
+  background: #fff;
+}
+
+.shell-brand > strong {
   font-size: var(--fs-xl);
   letter-spacing: -0.02em;
 }

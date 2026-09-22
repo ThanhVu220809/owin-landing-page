@@ -9,10 +9,9 @@
  * ---------------------------------------------------------------------------
  * ĐỌC TRƯỚC KHI ĐƯA LÊN MẠNG
  * ---------------------------------------------------------------------------
- * Số điện thoại, Zalo, Messenger, địa chỉ dưới đây đều là SỐ GIẢ (`0000 000 000`
- * và `example.com`) — cố ý để nhìn là biết chưa thay, không phải số thật gõ
- * nhầm. Đưa trang lên mạng khi chúng còn nguyên nghĩa là khách bấm gọi sẽ
- * không gọi được ai.
+ * Số điện thoại, Zalo và địa chỉ đã là THẬT. Messenger và giờ làm việc để
+ * TRỐNG — chuỗi rỗng nghĩa là "không có", nên nút Messenger và dòng giờ làm
+ * việc tự ẩn. Điền vào là chúng hiện ra, không phải sửa code.
  *
  * Phần chữ mô tả cố ý KHÔNG chứa con số hay lời hứa nào: không "15 năm kinh
  * nghiệm", không "5.000 công trình", không "bảo hành 10 năm". Những câu đó nghe
@@ -26,6 +25,8 @@
 
 export interface SiteContent {
   brand: string;
+  /** Logo hiện cạnh tên thương hiệu. `null` thì chỉ hiện tên bằng chữ. */
+  brandLogo: string | null;
   seo: {
     /** Thẻ <title> và tiêu đề khi chia sẻ link. Khoảng 50–60 ký tự. */
     title: string;
@@ -79,6 +80,7 @@ export interface SiteContent {
 
 export const content: SiteContent = {
   brand: 'OWIN',
+  brandLogo: '/logo.webp',
 
   seo: {
     title: 'OWIN — Cửa nhôm kính, xem giá ngay trên web',
@@ -115,14 +117,15 @@ export const content: SiteContent = {
     image: null,
   },
 
-  // ↓↓↓ TẤT CẢ ĐỀU LÀ GIẢ — THAY TRƯỚC KHI ĐƯA LÊN MẠNG ↓↓↓
   contact: {
-    phone: '0000000000',
-    phoneLabel: '0000 000 000',
-    zaloUrl: 'https://zalo.me/0000000000',
-    messengerUrl: 'https://m.me/example',
-    address: 'Chưa cập nhật địa chỉ',
-    workingHours: 'Chưa cập nhật giờ làm việc',
+    phone: '0799040616',
+    phoneLabel: '0799 040 616',
+    zaloUrl: 'https://zalo.me/0799040616',
+    // Chưa có Messenger. Chuỗi rỗng nghĩa là KHÔNG CÓ — nút tự ẩn, chứ không
+    // trỏ vào một địa chỉ bịa rồi để khách bấm vào chỗ không tồn tại.
+    messengerUrl: '',
+    address: 'Yên Hòa - Tiên Điền - Hà Tĩnh',
+    workingHours: '',
   },
 };
 
@@ -133,5 +136,6 @@ export const content: SiteContent = {
  */
 export function contactIsPlaceholder(c: SiteContent['contact'] = content.contact): boolean {
   return c.phone.replace(/\D/g, '') === '0000000000'
+    || c.zaloUrl.includes('0000000000')
     || c.messengerUrl.includes('example');
 }

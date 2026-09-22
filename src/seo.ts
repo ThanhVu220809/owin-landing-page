@@ -56,9 +56,11 @@ export function buildHeadTags(content: SiteContent): string[] {
       name: brand,
       description: seo.description,
       telephone: content.contact.phone,
-      address: content.contact.address,
-      openingHours: content.contact.workingHours,
     };
+    // Chỉ khai trường nào thật sự có. Phát ra `"address": ""` là khẳng định với
+    // máy rằng cửa hàng có địa chỉ rỗng, tệ hơn là không nói gì về địa chỉ.
+    if (content.contact.address) business.address = content.contact.address;
+    if (content.contact.workingHours) business.openingHours = content.contact.workingHours;
     if (seo.siteUrl) business.url = seo.siteUrl;
     if (seo.ogImage) business.image = seo.ogImage;
     // `</script>` lọt vào trong JSON sẽ đóng sớm thẻ script và biến phần còn lại

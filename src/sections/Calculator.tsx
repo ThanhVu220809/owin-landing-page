@@ -196,10 +196,17 @@ export function Calculator({
                 Giá tham khảo, chưa gồm lắp đặt và vận chuyển. Số cuối cùng theo khảo sát thực tế.
               </p>
 
+              {/* Kênh nào để trống thì không hiện nút — xem `Contact.tsx`. */}
               <div className="calculator-actions">
-                <a className="btn btn-primary" href={`tel:${contact.phone}`}>Gọi</a>
-                <a className="btn" href={contact.zaloUrl} target="_blank" rel="noopener noreferrer">Zalo</a>
-                <a className="btn" href={contact.messengerUrl} target="_blank" rel="noopener noreferrer">Messenger</a>
+                {contact.phone && (
+                  <a className="btn btn-primary" href={`tel:${contact.phone}`}>Gọi</a>
+                )}
+                {contact.zaloUrl && (
+                  <a className="btn" href={contact.zaloUrl} target="_blank" rel="noopener noreferrer">Zalo</a>
+                )}
+                {contact.messengerUrl && (
+                  <a className="btn" href={contact.messengerUrl} target="_blank" rel="noopener noreferrer">Messenger</a>
+                )}
               </div>
             </>
           )}
