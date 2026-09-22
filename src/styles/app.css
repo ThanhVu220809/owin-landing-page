@@ -662,9 +662,14 @@
   }
 
   .hero-arch-actions .btn {
-    flex: 1 1 calc(50% - 8px);
+    flex: 1 1 0;
     justify-content: center;
     min-width: 0;
+  }
+
+  .hero-arch-actions .btn:last-child {
+    flex: 0 0 100%;
+    width: 100%;
   }
 }
 
@@ -1740,6 +1745,35 @@
   right: 16px;
   height: 2px;
   background: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .system-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+    overflow: visible;
+  }
+
+  .system-tab {
+    min-width: 0;
+    width: 100%;
+    padding: 9px 8px;
+    white-space: normal;
+  }
+
+  .system-tab-name,
+  .system-tab-badge {
+    max-width: 100%;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .system-tab-line {
+    left: 10px;
+    right: 10px;
+  }
 }
 
 .system-card {

@@ -15,8 +15,8 @@ type Appearance = "light" | "dark" | "system";
 
 const NAV = [
   { href: "#san-pham", label: "Sản phẩm", number: "01" },
-  { href: "#tinh-gia", label: "Tính giá", number: "02" },
-  { href: "#he-nhom", label: "Hệ nhôm", number: "03" },
+  { href: "#he-nhom", label: "Hệ nhôm", number: "02" },
+  { href: "#tinh-gia", label: "Tính giá", number: "03" },
   { href: "#lien-he", label: "Liên hệ", number: "04" },
 ];
 
@@ -35,7 +35,7 @@ function App() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 40);
 
-      const sections = ["san-pham", "tinh-gia", "he-nhom", "lien-he"];
+      const sections = ["san-pham", "he-nhom", "tinh-gia", "lien-he"];
       const scrollPos = window.scrollY + 200;
 
       for (let i = sections.length - 1; i >= 0; i--) {
@@ -180,14 +180,14 @@ function App() {
         {/* 2. Large Product Showcase */}
         <Products onCalculate={calculateProduct} />
 
-        {/* 3. Interactive Quotation Studio */}
+        {/* 3. Product / Material Storytelling */}
+        <MaterialStory />
+
+        {/* 4. Interactive Quotation Studio */}
         <Calculator
           selectedId={selectedProductId}
           onSelect={setSelectedProductId}
         />
-
-        {/* 4. Product / Material Storytelling */}
-        <MaterialStory />
 
         {/* 5. Large Premium CTA & Contact */}
         <Contact />

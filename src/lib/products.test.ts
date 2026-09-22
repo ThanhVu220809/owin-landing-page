@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   dedupeProductOptions,
+  getLoadMoreCount,
+  INITIAL_PRODUCT_COUNT,
+  LOAD_MORE_BATCH_SIZE,
   normalizeCategory,
   type ProductOption,
 } from "@/lib/products";
@@ -88,5 +91,18 @@ describe("normalizeCategory", () => {
   it("chuẩn hóa hoa thường và dấu phân cách danh mục", () => {
     expect(normalizeCategory("  cửa chính  ")).toBe("Cửa Chính");
     expect(normalizeCategory("cửa phụ ,wc")).toBe("Cửa Phụ / WC");
+  });
+});
+
+describe("product pagination defaults", () => {
+  it("hiển thị tối đa 8 sản phẩm đầu tiên để giữ nhịp trải nghiệm", () => {
+    expect(INITIAL_PRODUCT_COUNT).toBe(8);
+  });
+
+  it("mỗi lần xem thêm chỉ mở rộng tối đa 16 sản phẩm", () => {
+    expect(LOAD_MORE_BATCH_SIZE).toBe(16);
+    expect(getLoadMoreCount(40, 8)).toBe(16);
+    expect(getLoadMoreCount(20, 8)).toBe(12);
+    expect(getLoadMoreCount(8, 8)).toBe(0);
   });
 });
