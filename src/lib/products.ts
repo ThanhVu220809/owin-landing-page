@@ -52,7 +52,7 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
 
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((row) => {
+  const options = (data ?? []).map((row) => {
     const r = row as {
       id: string;
       name: string | null;
@@ -68,6 +68,7 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
       unitPriceVnd: r.unit_price_vnd,
     };
   });
+  return dedupeProductOptions(options);
 }
 
 /**
@@ -93,6 +94,35 @@ export async function fetchFeaturedProducts(limit = 8): Promise<ProductRecord[]>
 
   if (error) throw new Error(error.message);
   return (data ?? []).map((row) => (row as { data: ProductRecord }).data);
+}
+
+/**
+ * Gộp các mục trùng nhau trong bộ chọn.
+ *
+ * Danh mục có nhiều bản ghi TRÙNG HỆT NHAU về tên, kích thước mẫu và đơn giá —
+ * cùng một sản phẩm được nhập nhiều lần. Trong công cụ quản trị chúng còn phân
+ * biệt được bằng mã và thông số, nhưng trong bộ chọn của khách thì chúng hiện
+ * ra thành một loạt dòng y hệt nhau, không có cách nào chọn đúng cái nào.
+ *
+ * Khoá gộp bỏ qua chữ hoa/thường, và cố ý KHÔNG tính nhóm sản phẩm: dữ liệu
+ * đang có cả "Cửa chính" lẫn "Cửa Chính" nên tính nhóm vào thì hai bản ghi y
+ * hệt nhau vẫn nằm lại thành hai dòng.
+ *
+ * Đây là che bớt chứ không phải sửa gốc — gốc là dữ liệu trùng, phải dọn trong
+ * tab Sản phẩm. Giữ mục ĐẦU TIÊN để thứ tự kéo-thả của chủ cửa hàng vẫn đúng.
+ */
+export function dedupeProductOptions(options: ProductOption[]): ProductOption[] {
+  const seen = new Set<string>();
+  return options.filter((option) => {
+    const key = [
+      option.name.trim().toLowerCase(),
+      (option.rawSizeText ?? '').trim().toLowerCase(),
+      option.unitPriceVnd ?? '',
+    ].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 /** Tài liệu đầy đủ của một sản phẩm — cần cột `data` mới tính được tiền. */
