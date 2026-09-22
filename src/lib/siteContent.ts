@@ -81,6 +81,7 @@ export function mergeSiteContent(
       messengerUrl: safeUrl(contactDoc.messengerUrl, base.contact.messengerUrl),
       address: pick(contactDoc.address, base.contact.address),
       workingHours: pick(contactDoc.workingHours, base.contact.workingHours),
+      mapUrl: base.contact.mapUrl,
     },
   };
 }

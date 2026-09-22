@@ -75,6 +75,7 @@ export interface SiteContent {
     messengerUrl: string;
     address: string;
     workingHours: string;
+    mapUrl?: string;
   };
 }
 
@@ -126,6 +127,7 @@ export const content: SiteContent = {
     messengerUrl: "",
     address: "Yên Hòa - Tiên Điền - Hà Tĩnh",
     workingHours: "T2–T7: 7:00–17:00",
+    mapUrl: "https://maps.app.goo.gl/rdGUCA1xoCqKuDv5A",
   },
 };
 
