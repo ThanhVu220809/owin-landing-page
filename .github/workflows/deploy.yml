@@ -19,9 +19,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VITE_SUPABASE_URL: https://example-project.supabase.co
-      VITE_SUPABASE_ANON_KEY: example-anon-key
-      VITE_STORE_ID: owin
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      VITE_STORE_ID: ${{ secrets.VITE_STORE_ID || 'owin' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
