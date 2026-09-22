@@ -30,6 +30,27 @@ export interface ProductOption {
   unitPriceVnd: number | null;
 }
 
+/** Chuẩn hóa nhãn hiển thị và khóa lọc danh mục từ dữ liệu quản trị. */
+export function normalizeCategory(category: string | null | undefined): string {
+  const normalized = (category ?? '')
+    .trim()
+    .replace(/\s*,\s*/g, ' / ')
+    .replace(/\s*\/\s*/g, ' / ')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+
+  if (!normalized) return '';
+
+  return normalized
+    .split(' ')
+    .map((word) => {
+      if (word === 'wc') return 'WC';
+      if (word === '/') return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+}
+
 /**
  * Danh sách cho bộ chọn sản phẩm.
  *
@@ -69,7 +90,7 @@ export async function fetchProductOptions(): Promise<ProductOption[]> {
     return {
       id: r.id,
       name: r.name ?? "",
-      category: r.category ?? "",
+      category: normalizeCategory(r.category),
       rawSizeText: r.raw_size_text,
       unitPriceVnd: r.unit_price_vnd,
     };

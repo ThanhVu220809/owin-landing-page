@@ -6,7 +6,7 @@
  * - Deep black typography with high editorial contrast
  * - OWIN blue strictly as an architectural accent
  * - Thin hairline borders & restrained shadows
- * - Geometric architectural radii (4px - 12px)
+ * - Soft continuous radii with architectural restraint
  */
 
 :root {
@@ -64,14 +64,15 @@
   --input-h: 42px;
 
   /* Architectural Radii - Softened but restrained */
-  --r-xs: 6px;
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
   --r-full: 9999px;
 
   /* Typography Scale */
-  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Be Vietnam Pro', -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --fs-2xs: 0.71875rem; /* 11.5px */
@@ -100,8 +101,8 @@
 
   /* Restrained Architectural Shadows */
   --shadow-subtle: 0 1px 3px rgba(18, 24, 31, 0.04);
-  --shadow-sm: 0 10px 24px -14px rgba(18, 24, 31, 0.16);
-  --shadow-md: 0 18px 38px -18px rgba(18, 24, 31, 0.18);
+  --shadow-sm: 0 4px 12px rgba(18, 24, 31, 0.04), 0 1px 2px rgba(18, 24, 31, 0.02);
+  --shadow-md: 0 12px 32px rgba(18, 24, 31, 0.06), 0 2px 6px rgba(18, 24, 31, 0.03);
   --shadow-lg: 0 26px 54px -22px rgba(18, 24, 31, 0.2);
 
   /* Smooth Architectural Timing */
@@ -205,6 +206,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+button {
+  font-family: var(--font-display);
 }
 
 @media (prefers-reduced-motion: reduce) {

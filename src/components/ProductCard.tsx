@@ -5,6 +5,7 @@ import type { ProductRecord } from '@owin/quote-engine';
 import { listImageUrl } from '@/lib/images';
 import { formatVnd } from '@/lib/format';
 import { priceFor } from '@/lib/price';
+import { normalizeCategory } from "@/lib/products";
 
 const MAX_SPECS = 3;
 
@@ -37,7 +38,7 @@ export function ProductCard({
       onMouseLeave={() => setIsHovered(false)}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
+      viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] as const }}
     >
       <div className="arch-card-media">
@@ -56,7 +57,9 @@ export function ProductCard({
           </div>
         )}
         {product.category && (
-          <span className="arch-card-category-tag">{product.category}</span>
+          <span className="arch-card-category-tag">
+            {normalizeCategory(product.category)}
+          </span>
         )}
       </div>
 
@@ -83,7 +86,9 @@ export function ProductCard({
         <div className="arch-card-footer">
           <div className="arch-price-block">
             <span className="arch-price-label">{priceLabel(product)}</span>
-            <strong className="arch-price-value">{formatVnd(price.displayVnd)}</strong>
+            <strong className="arch-price-value">
+              {formatVnd(price.displayVnd)}
+            </strong>
           </div>
 
           <button

@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Layers, ArrowDown } from 'lucide-react';
 import type { ProductRecord } from '@owin/quote-engine';
-import { PAGE_SIZE, fetchPublicProducts } from '@/lib/products';
+import {
+  PAGE_SIZE,
+  fetchPublicProducts,
+  normalizeCategory,
+} from "@/lib/products";
 import { ProductCard } from '@/components/ProductCard';
 
 export function Products({ onCalculate }: { onCalculate: (id: string) => void }) {
@@ -47,7 +51,8 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
     const map = new Map<string, number>();
     for (const p of products) {
       if (p.category) {
-        map.set(p.category, (map.get(p.category) || 0) + 1);
+        const category = normalizeCategory(p.category);
+        map.set(category, (map.get(category) || 0) + 1);
       }
     }
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
@@ -55,7 +60,9 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
 
   const displayedProducts = useMemo(() => {
     if (activeCategory === 'all') return products;
-    return products.filter((p) => p.category === activeCategory);
+    return products.filter(
+      (p) => normalizeCategory(p.category) === activeCategory,
+    );
   }, [products, activeCategory]);
 
   if (status === 'loading') {
