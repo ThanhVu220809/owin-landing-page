@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Layers, ArrowDown } from 'lucide-react';
-import type { ProductRecord } from '@owin/quote-engine';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Layers, ArrowDown, ArrowUp } from "lucide-react";
+import type { ProductRecord } from "@owin/quote-engine";
 import {
   fetchPublicProducts,
   getLoadMoreCount,
@@ -9,14 +9,21 @@ import {
   LOAD_MORE_BATCH_SIZE,
   normalizeCategory,
 } from "@/lib/products";
-import { ProductCard } from '@/components/ProductCard';
+import { ProductCard } from "@/components/ProductCard";
 
-export function Products({ onCalculate }: { onCalculate: (id: string) => void }) {
+export function Products({
+  onCalculate,
+}: {
+  onCalculate: (id: string) => void;
+}) {
   const [products, setProducts] = useState<ProductRecord[]>([]);
   const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const [loadingMore, setLoadingMore] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,8 +51,9 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
       );
       setProducts((current) => [...current, ...page.products]);
       setTotal(page.total);
+      setIsExpanded(true);
     } catch {
-      setStatus('error');
+      setStatus("error");
     } finally {
       setLoadingMore(false);
     }
@@ -64,13 +72,18 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
   }, [products]);
 
   const displayedProducts = useMemo(() => {
-    if (activeCategory === 'all') return products;
-    return products.filter(
-      (p) => normalizeCategory(p.category) === activeCategory,
-    );
-  }, [products, activeCategory]);
+    const filteredProducts =
+      activeCategory === "all"
+        ? products
+        : products.filter(
+            (p) => normalizeCategory(p.category) === activeCategory,
+          );
+    return isExpanded
+      ? filteredProducts
+      : filteredProducts.slice(0, INITIAL_PRODUCT_COUNT);
+  }, [products, activeCategory, isExpanded]);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <section className="section" id="san-pham" aria-busy="true">
         <div className="section-head">
@@ -86,7 +99,7 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <section className="section" id="san-pham">
         <div className="arch-notice" role="alert">
@@ -146,7 +159,7 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
         )}
       </div>
 
-      <motion.div layout className="arch-product-grid">
+      <motion.div className="arch-product-grid">
         <AnimatePresence>
           {displayedProducts.map((product) => (
             <ProductCard
@@ -158,26 +171,49 @@ export function Products({ onCalculate }: { onCalculate: (id: string) => void })
         </AnimatePresence>
       </motion.div>
 
-      {products.length < total && (
+      {total > INITIAL_PRODUCT_COUNT && (
         <div className="section-more">
-          <button
-            type="button"
-            className="btn btn-secondary btn-load-more"
-            onClick={() => void loadMore()}
-            disabled={loadingMore}
-          >
-            {loadingMore ? (
-              <span>Đang tải thêm...</span>
-            ) : (
-              <>
-                <span>
-                  Xem thêm {getLoadMoreCount(total, products.length)} sản phẩm
-                  khác
-                </span>
-                <ArrowDown size={15} />
-              </>
-            )}
-          </button>
+          {products.length < total && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-load-more"
+              onClick={() => void loadMore()}
+              disabled={loadingMore}
+            >
+              {loadingMore ? (
+                <span>Đang tải thêm...</span>
+              ) : (
+                <>
+                  <span>
+                    Xem thêm {getLoadMoreCount(total, products.length)} sản phẩm
+                    khác
+                  </span>
+                  <ArrowDown size={15} />
+                </>
+              )}
+            </button>
+          )}
+
+          {isExpanded ? (
+            <button
+              type="button"
+              className="btn btn-secondary btn-load-more"
+              onClick={() => setIsExpanded(false)}
+              disabled={loadingMore}
+            >
+              <span>Ẩn bớt sản phẩm</span>
+              <ArrowUp size={15} />
+            </button>
+          ) : products.length >= total ? (
+            <button
+              type="button"
+              className="btn btn-secondary btn-load-more"
+              onClick={() => setIsExpanded(true)}
+            >
+              <span>Hiện tất cả sản phẩm</span>
+              <ArrowDown size={15} />
+            </button>
+          ) : null}
         </div>
       )}
     </section>
