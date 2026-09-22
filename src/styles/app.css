@@ -2,22 +2,36 @@
   max-width: 1120px;
   /* Lề 16px hai bên ở khổ hẹp: 375px không được tràn ngang. */
   margin: 0 auto;
-  padding: var(--space-6) var(--space-4) var(--space-8);
+  padding: 0 var(--space-4) var(--space-8);
 }
 
+/* ─── iOS Floating Frosted Glass Header ─── */
 .shell-head {
+  position: sticky;
+  top: 14px;
+  z-index: 100;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  margin-top: 14px;
   margin-bottom: var(--space-8);
+  padding: 8px 14px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-ios-nav);
+  transition: background 0.25s var(--ease-ios), border-color 0.25s var(--ease-ios), box-shadow 0.25s var(--ease-ios);
 }
 
 .shell-brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  user-select: none;
 }
 
 /* Logo có nền trong suốt và mực sẫm — ở chế độ tối nó gần như biến mất, nên
@@ -25,41 +39,103 @@
 .shell-brand img {
   display: block;
   width: auto;
-  height: 28px;
-  padding: 3px 5px;
+  height: 26px;
+  padding: 3px 6px;
   border-radius: var(--r-sm);
-  background: #fff;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .shell-brand > strong {
-  font-size: var(--fs-xl);
-  letter-spacing: -0.02em;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
+/* ─── Navigation Pills ─── */
+.shell-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.shell-nav a {
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.18s var(--ease-ios), background-color 0.18s var(--ease-ios);
+}
+
+.shell-nav a:hover {
+  color: var(--text);
+  background: var(--glass-bg-hover);
+}
+
+/* ─── iOS Segmented Control (Theme Switcher) ─── */
 .theme-switch {
   display: inline-flex;
+  align-items: center;
+  gap: 2px;
   padding: 3px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border-subtle);
   border-radius: var(--r-pill);
-  background: var(--surface);
+  background: rgba(120, 120, 128, 0.12);
 }
 
 .theme-switch button {
-  min-height: 34px;
-  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 0 10px;
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
   color: var(--text-muted);
   font: inherit;
-  font-size: var(--fs-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.22s var(--ease-ios);
+  user-select: none;
+}
+
+.theme-switch button:hover {
+  color: var(--text);
 }
 
 .theme-switch button.is-active {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-weight: 500;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.theme-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  opacity: 0.65;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.theme-switch button.is-active .theme-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+
+@media (max-width: 680px) {
+  .shell-head {
+    border-radius: 20px;
+    padding: 8px 12px;
+  }
+
+  .theme-switch button {
+    padding: 0 8px;
+    font-size: 0.75rem;
+  }
 }
 
 .muted { color: var(--text-muted); }
@@ -85,18 +161,34 @@
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: 44px;
-  padding: 0 24px;
+  padding: 0 22px;
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--text);
   font: inherit;
+  font-size: var(--fs-sm);
   font-weight: 500;
   cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+  transition: all 0.22s var(--ease-ios);
 }
 
-.btn:hover:not(:disabled) { background: var(--surface-muted); }
+.btn:hover:not(:disabled) {
+  background: var(--surface-muted);
+  border-color: rgba(60, 60, 67, 0.28);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
 .btn:disabled { opacity: 0.6; cursor: progress; }
 
 .notice {
@@ -241,90 +333,221 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── Hero ───
- * Tối giản, chữ làm chủ đạo. Không parallax, không kính mờ, không gradient
- * nhiều lớp — UX đứng trên hiệu ứng. */
+/* ─── Hero (iOS / Apple Ambient Showcase) ─── */
 .hero {
+  position: relative;
   display: grid;
   gap: var(--space-8);
-  padding: var(--space-8) 0 calc(var(--space-8) * 1.5);
+  padding: calc(var(--space-8) * 1.2) 0 calc(var(--space-8) * 1.8);
+  isolation: isolate;
+}
+
+/* Ánh sáng môi trường (Apple ambient lighting) — tạo chiều sâu không gian */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, 94vw);
+  height: 380px;
+  background: var(--hero-glow);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(40px);
+  border-radius: 50%;
 }
 
 @media (min-width: 900px) {
-  /* Có ảnh thì chia đôi; không ảnh thì chữ chiếm trọn nhưng vẫn giới hạn bề
-     rộng dòng để còn đọc được. */
+  /* Có ảnh thì chia đôi; không ảnh thì chữ chiếm trọn */
   .hero:has(.hero-media) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.15fr 0.85fr;
     align-items: center;
   }
 }
 
-.hero-copy { max-width: 46ch; }
+.hero-copy {
+  max-width: 48ch;
+}
 
-/* Không có ảnh thì căn giữa. Để lệch trái, nửa phải trống hoác trông như ảnh
- * chưa tải được chứ không phải một lựa chọn bố cục. */
+/* Hiệu ứng xuất hiện mượt mà chuẩn iOS */
+.hero-copy > * {
+  animation: iosFadeUp 0.6s var(--ease-ios) backwards;
+}
+
+.hero-copy > *:nth-child(1) { animation-delay: 0.04s; }
+.hero-copy > *:nth-child(2) { animation-delay: 0.1s; }
+.hero-copy > *:nth-child(3) { animation-delay: 0.18s; }
+.hero-copy > *:nth-child(4) { animation-delay: 0.25s; }
+
+@keyframes iosFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Không có ảnh thì căn giữa */
 .hero:not(:has(.hero-media)) .hero-copy {
   margin-inline: auto;
   text-align: center;
 }
 
-.hero:not(:has(.hero-media)) .hero-actions { justify-content: center; }
-
-.hero-eyebrow {
-  margin: 0 0 var(--space-3);
-  color: var(--text-faint);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.hero:not(:has(.hero-media)) .hero-actions {
+  justify-content: center;
 }
 
+/* Eyebrow — iOS Capsule Badge */
+.hero-eyebrow-wrap {
+  display: flex;
+  margin-bottom: var(--space-4);
+}
+
+.hero:not(:has(.hero-media)) .hero-eyebrow-wrap {
+  justify-content: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--hero-eyebrow-bg);
+  border: 1px solid var(--hero-eyebrow-border);
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--hero-eyebrow-shadow);
+  transition: transform 0.2s var(--ease-ios), box-shadow 0.2s var(--ease-ios);
+}
+
+.hero-eyebrow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.16);
+}
+
+.hero-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: iosPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes iosPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+/* Tiêu đề Apple Display Typography */
 .hero-title {
   margin: 0 0 var(--space-4);
   font-size: var(--fs-display);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.038em;
+  line-height: 1.08;
   text-wrap: balance;
+  background: var(--hero-title-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero-description {
   margin: 0 0 var(--space-6);
   color: var(--text-muted);
-  font-size: var(--fs-lg);
-  line-height: 1.55;
+  font-size: clamp(1.025rem, 0.95rem + 0.35vw, 1.2rem);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
   text-wrap: pretty;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-3);
 }
 
-/* Nút là <button> và <a> lẫn lộn — ép cùng một hình dạng để không lệch nhau. */
 .hero-actions .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  min-height: 48px;
+  padding: 0 24px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
+.btn-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform 0.22s var(--ease-ios);
+}
+
+/* Nút chính phong cách Apple: gradient xanh rực rỡ + highlight mép trên */
 .btn-primary {
-  border-color: transparent;
-  background: var(--accent);
-  color: var(--accent-contrast);
+  border: 1px solid rgba(0, 113, 227, 0.25);
+  background: linear-gradient(180deg, #0077ed 0%, #0062cc 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px -2px rgba(0, 113, 227, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent);
-  filter: brightness(1.08);
+  background: linear-gradient(180deg, #0f82f2 0%, #006be0 100%);
+  box-shadow: 0 8px 24px -4px rgba(0, 113, 227, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:hover .btn-icon {
+  transform: translateX(3px);
+}
+
+/* Nút phụ kính mờ Apple Frosted Glass */
+.btn-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--btn-glass-border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-glass:hover:not(:disabled) {
+  background: var(--glass-bg-hover);
+  border-color: rgba(60, 60, 67, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.btn-glass:hover .btn-icon {
+  transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .hero-media {
   overflow: hidden;
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 .hero-media img {
@@ -544,19 +767,7 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
-.shell-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-}
 
-.shell-nav a {
-  color: var(--text-muted);
-  font-size: var(--fs-sm);
-  text-decoration: none;
-}
-
-.shell-nav a:hover { color: var(--text); }
 
 .shell-foot {
   margin-top: var(--space-8);

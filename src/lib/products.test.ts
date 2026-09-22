@@ -29,20 +29,28 @@ describe('dedupeProductOptions', () => {
     expect(result[0].id).toBe('dau');
   });
 
-  it('khác giá thì giữ cả hai', () => {
+  it("cùng tên nhưng khác giá thì vẫn gộp thành 1", () => {
     const result = dedupeProductOptions([
-      option('a', 'Cửa A', '2.80 x 2.80', 6_700_000),
-      option('b', 'Cửa A', '2.80 x 2.80', 6_800_000),
+      option("a", "Cửa A", "2.80 x 2.80", 6_700_000),
+      option("b", "Cửa A", "2.80 x 2.80", 6_800_000),
     ]);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(1);
   });
 
-  it('khác kích thước thì giữ cả hai', () => {
+  it("cùng tên nhưng khác kích thước thì vẫn gộp thành 1", () => {
     const result = dedupeProductOptions([
-      option('a', 'Cửa A', '2.80 x 2.80', 6_700_000),
-      option('b', 'Cửa A', '2.40 x 2.80', 6_700_000),
+      option("a", "Cửa A", "2.80 x 2.80", 6_700_000),
+      option("b", "Cửa A", "2.40 x 2.80", 6_700_000),
     ]);
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(1);
+  });
+
+  it("gộp được khi cùng tên nhưng kích thước viết khác định dạng", () => {
+    const result = dedupeProductOptions([
+      option("a", "Cửa A", "2,80 x 2,80", 6_800_000),
+      option("b", "Cửa A", "2.80 x 2.80", 6_800_000),
+    ]);
+    expect(result.map((o) => o.id)).toEqual(["a"]);
   });
 
   it('gộp được cả khi nhóm khác nhau về viết hoa', () => {

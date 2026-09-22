@@ -125,16 +125,25 @@ export async function fetchFeaturedProducts(
  * Đây là che bớt chứ không phải sửa gốc — gốc là dữ liệu trùng, phải dọn trong
  * tab Sản phẩm. Giữ mục ĐẦU TIÊN để thứ tự kéo-thả của chủ cửa hàng vẫn đúng.
  */
+function normalizeOptionKey(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/,/g, ".")
+    .replace(/\s*[*xX]\s*/g, " x ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 export function dedupeProductOptions(
   options: ProductOption[],
 ): ProductOption[] {
   const seen = new Set<string>();
   return options.filter((option) => {
-    const key = [
-      option.name.trim().toLowerCase(),
-      (option.rawSizeText ?? "").trim().toLowerCase(),
-      option.unitPriceVnd ?? "",
-    ].join("|");
+    const key = normalizeOptionKey(option.name);
+    if (!key) return true;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
